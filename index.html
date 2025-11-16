@@ -1,0 +1,246 @@
+<!doctype html>
+
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>نظام عين النسر — Eagle Eye (نسخة ويب)</title>
+  <!-- Tailwind CDN for quick styling (suitable for prototype/static) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* small extra styles to mimic terminal-ish card */
+    body { background: linear-gradient(90deg,#0f172a 0%, #071024 100%); }
+    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+    .mon { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace; }
+    .logo-box { border-radius: .75rem; border: 1px solid rgba(255,255,255,0.04); }
+  </style>
+</head>
+<body class="min-h-screen p-6 text-white">
+  <div class="max-w-6xl mx-auto">
+    <div class="p-4 logo-box glass mb-6">
+      <div class="flex items-center gap-4">
+        <div class="rounded-md px-3 py-2 bg-gradient-to-r from-blue-700 to-cyan-500 text-white font-bold">🦅 عين النسر</div>
+        <div class="text-sm opacity-80">نسخة ويب تجريبية — بيانات مباشرة من Binance (BTC/USDT)</div>
+      </div>
+    </div><div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  <div class="col-span-2 glass p-4 rounded-xl">
+    <div class="flex justify-between items-start">
+      <div>
+        <h2 class="text-2xl font-bold">السعر الحالي</h2>
+        <div id="price" class="text-4xl font-extrabold mt-2">--</div>
+        <div id="price-change" class="text-sm mt-1 opacity-80"></div>
+      </div>
+      <div class="text-right">
+        <div class="text-sm opacity-80">الوقت</div>
+        <div id="now" class="mon font-semibold">--</div>
+        <div class="mt-3 text-xs opacity-70">طلبات: <span id="requests">0</span></div>
+      </div>
+    </div>
+
+    <hr class="my-4 border-gray-700" />
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="p-3 rounded-md glass">
+        <div class="text-xs opacity-80">الدعم</div>
+        <div id="support" class="font-semibold">--</div>
+      </div>
+      <div class="p-3 rounded-md glass">
+        <div class="text-xs opacity-80">المقاومة</div>
+        <div id="resistance" class="font-semibold">--</div>
+      </div>
+      <div class="p-3 rounded-md glass">
+        <div class="text-xs opacity-80">إشارة</div>
+        <div id="signal" class="font-bold text-yellow-300">⚪ انتظار</div>
+        <div id="signal-txt" class="text-xs opacity-80 mt-1"></div>
+      </div>
+    </div>
+
+    <hr class="my-4 border-gray-700" />
+
+    <div>
+      <h3 class="font-semibold">تفاصيل الصفقات الأخيرة (تراكمي)</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+        <div class="p-3 rounded-md glass">
+          <div class="text-xs opacity-80">شراء تراكمي (BTC)</div>
+          <div id="cum-buys" class="font-semibold">0.0000</div>
+        </div>
+        <div class="p-3 rounded-md glass">
+          <div class="text-xs opacity-80">بيع تراكمي (BTC)</div>
+          <div id="cum-sells" class="font-semibold">0.0000</div>
+        </div>
+        <div class="p-3 rounded-md glass">
+          <div class="text-xs opacity-80">فرق تراكمي (BTC)</div>
+          <div id="cum-diff" class="font-semibold">0.0000</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="glass p-4 rounded-xl">
+    <h3 class="font-semibold">إحصائيات ثانية</h3>
+    <div class="mt-3 text-sm">
+      <div>شراء / ثانية: <span id="sec-buy">0.0000</span> BTC</div>
+      <div>بيع / ثانية: <span id="sec-sell">0.0000</span> BTC</div>
+      <div class="mt-2">الفرق: <span id="sec-diff">0.0000</span> BTC</div>
+    </div>
+
+    <hr class="my-3 border-gray-700" />
+
+    <div class="text-sm opacity-80">إعدادات النظام</div>
+    <div class="mt-2 text-xs">
+      عتبة التفاوت: <input id="vol-threshold" class="w-20 text-black rounded px-1" value="10"> BTC<br>
+      وقت التبريد (ث): <input id="cooldown" class="w-20 text-black rounded px-1" value="20">
+    </div>
+
+    <hr class="my-3 border-gray-700" />
+    <div class="text-xs opacity-70">ملاحظات:</div>
+    <ul class="text-xs mt-2 opacity-80 list-disc list-inside">
+      <li>هذه نسخة واجهة أمامية فقط — قد تواجه حدود CORS أو قيود معدل من Binance.</li>
+      <li>للنشر الاحترافي استخدم وظيفة سيرفر (Serverless) كبروكسي لمصادر الـ API.</li>
+    </ul>
+
+  </div>
+</div>
+
+<footer class="mt-6 text-center text-xs opacity-70">بُنيت بسرعة لتحويل برنامج بايثون إلى واجهة ويب — EagleEye OneShot (Prototype)</footer>
+
+  </div>  <script>
+  /* ======== منطق العميل — يُحاكي سلوك السكربت الأصلي ======== */
+  const API = {
+    ticker: 'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT',
+    depth:  'https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=50',
+    trades: 'https://api.binance.com/api/v3/trades?symbol=BTCUSDT&limit=100'
+  };
+
+  let state = {
+    prevPrice: 0.0,
+    cumBuys: 0.0,
+    cumSells: 0.0,
+    lastTradeId: null,
+    secBuy: 0.0,
+    secSell: 0.0,
+    lastSecondTs: 0,
+    requestCount: 0,
+    volThreshold: 10.0,
+    cooldownSec: 20,
+    lastSignalTime: 0,
+    currentSignal: '⚪ انتظار',
+    currentTxt: 'السوق هادئ، ننتظر تفاوت في الكمية'
+  };
+
+  function formatPrice(x){ return typeof x==='number' ? x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : x }
+  function nowStr(){ return new Date().toLocaleString('ar-EG'); }
+
+  async function fetchJson(url){
+    try{
+      const r = await fetch(url);
+      if(!r.ok) throw new Error(r.statusText);
+      state.requestCount++;
+      return await r.json();
+    }catch(e){
+      console.warn('fetch error',e);
+      return null;
+    }
+  }
+
+  function supportResistanceFromBook(ob){
+    try{
+      const bids = (ob.bids||[]).map(b=>[parseFloat(b[0]),parseFloat(b[1])]);
+      const asks = (ob.asks||[]).map(a=>[parseFloat(a[0]),parseFloat(a[1])]);
+      const support = bids.length? bids.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
+      const resistance = asks.length? asks.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
+      return [support,resistance];
+    }catch(e){ return [0,0]; }
+  }
+
+  function consumeNewTrades(trades){
+    if(!trades || !trades.length) return [0,0,null,null];
+    trades.sort((a,b)=>a.id-b.id);
+    if(state.lastTradeId===null){ state.lastTradeId = trades[trades.length-1].id; return [0,0,null,null]; }
+    let buy=0,sell=0,first=null,last=null;
+    for(const t of trades){ if(t.id>state.lastTradeId){ const q=parseFloat(t.qty); if(t.isBuyerMaker) sell+=q; else buy+=q; if(first===null) first=t.id; last=t.id; }}
+    if(last!==null) state.lastTradeId = last;
+    state.cumBuys += buy; state.cumSells += sell;
+    const now = Math.floor(Date.now()/1000);
+    if(now !== state.lastSecondTs){ state.secBuy = buy; state.secSell = sell; state.lastSecondTs = now; } else { state.secBuy += buy; state.secSell += sell; }
+    return [buy,sell,first,last];
+  }
+
+  function maybeFireSignal(price,support,resistance){
+    const now = Math.floor(Date.now()/1000);
+    const inCooldown = (now - state.lastSignalTime) < state.cooldownSec;
+    const cumDiff = Math.abs(state.cumBuys - state.cumSells);
+    const cumImb = state.cumBuys - state.cumSells;
+    if(cumDiff >= state.volThreshold && cumImb > 0){
+      if(!inCooldown || state.currentSignal !== '🟢 شراء 100%'){
+        const target = resistance>0? resistance : price*1.01;
+        state.currentSignal = '🟢 شراء 100%';
+        state.currentTxt = `تفوق تراكمي في كمية الشراء → هدف أول ~ ${target.toFixed(2)}$`;
+        state.lastSignalTime = now;
+      }
+      return;
+    }
+    if(cumDiff >= state.volThreshold && cumImb < 0){
+      if(!inCooldown || state.currentSignal !== '🔴 بيع 100%'){
+        const target = support>0? support : price*0.99;
+        state.currentSignal = '🔴 بيع 100%';
+        state.currentTxt = `تفوق تراكمي في كمية البيع → هدف أول ~ ${target.toFixed(2)}$`;
+        state.lastSignalTime = now;
+      }
+      return;
+    }
+    if(!inCooldown && !state.currentSignal.startsWith('⚪')){
+      state.currentSignal = '⚪ انتظار';
+      state.currentTxt = 'لا يوجد تفاوت واضح في الكمية. ننتظر فرقًا يبلغ '+state.volThreshold+'+ BTC.';
+    }
+  }
+
+  function render(price,support,resistance){
+    document.getElementById('now').textContent = nowStr();
+    document.getElementById('requests').textContent = state.requestCount;
+    document.getElementById('price').textContent = '$' + formatPrice(price);
+    const change = price - state.prevPrice;
+    const changePercent = state.prevPrice? (change/state.prevPrice*100):0;
+    const chEl = document.getElementById('price-change');
+    chEl.textContent = `${change>=0? '▲':'▼'} ${Math.abs(change).toFixed(2)} (${Math.abs(changePercent).toFixed(2)}%)`;
+    document.getElementById('support').textContent = support? '$'+formatPrice(support):'--';
+    document.getElementById('resistance').textContent = resistance? '$'+formatPrice(resistance):'--';
+    const sigEl = document.getElementById('signal'); sigEl.textContent = state.currentSignal;
+    document.getElementById('signal-txt').textContent = state.currentTxt;
+    document.getElementById('cum-buys').textContent = state.cumBuys.toFixed(4);
+    document.getElementById('cum-sells').textContent = state.cumSells.toFixed(4);
+    document.getElementById('cum-diff').textContent = (state.cumBuys - state.cumSells).toFixed(4);
+    document.getElementById('sec-buy').textContent = state.secBuy.toFixed(4);
+    document.getElementById('sec-sell').textContent = state.secSell.toFixed(4);
+    document.getElementById('sec-diff').textContent = (state.secBuy - state.secSell).toFixed(4);
+  }
+
+  async function tick(){
+    // read UI inputs
+    const thresh = parseFloat(document.getElementById('vol-threshold').value||'10');
+    const cooldown = parseInt(document.getElementById('cooldown').value||'20');
+    state.volThreshold = isFinite(thresh)? thresh: state.volThreshold;
+    state.cooldownSec = isFinite(cooldown)? cooldown: state.cooldownSec;
+
+    const ticker = await fetchJson(API.ticker);
+    if(!ticker) return;
+    const orderBook = await fetchJson(API.depth);
+    const trades = await fetchJson(API.trades);
+
+    const price = parseFloat(ticker.lastPrice || 0);
+    if(!state.prevPrice) state.prevPrice = price;
+    const [support,resistance] = orderBook? supportResistanceFromBook(orderBook) : [0,0];
+    consumeNewTrades(trades);
+    maybeFireSignal(price,support,resistance);
+    render(price,support,resistance);
+    state.prevPrice = price;
+  }
+
+  // start loop
+  setInterval(tick, 1000);
+  // also run immediately
+  tick();
+
+  </script></body>
+</html>
