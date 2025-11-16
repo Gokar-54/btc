@@ -17,7 +17,8 @@
 </head>
 <body class="min-h-screen p-6 text-white">
   <div class="max-w-6xl mx-auto">
-    <div class="p-4 logo-box glass mb-6">
+    <div class="p-4 logo-box glass mb-6 flex items-center gap-4">
+      <img src="https://img.icons8.com/?size=512&id=108556&format=png" class="w-20 drop-shadow-xl" />
       <div class="flex items-center gap-4">
         <div class="rounded-md px-3 py-2 bg-gradient-to-r from-blue-700 to-cyan-500 text-white font-bold">🦅 عين النسر</div>
         <div class="text-sm opacity-80">نسخة ويب تجريبية — بيانات مباشرة من Binance (BTC/USDT)</div>
@@ -106,6 +107,10 @@
 <footer class="mt-6 text-center text-xs opacity-70">بُنيت بسرعة لتحويل برنامج بايثون إلى واجهة ويب — EagleEye OneShot (Prototype)</footer>
 
   </div>  <script>
+  // ====== حفظ واسترجاع الحالة من localStorage ======
+  function saveState(){ localStorage.setItem('eagle_state', JSON.stringify(state)); }
+  function loadState(){ const s = localStorage.getItem('eagle_state'); if(s){ try{ Object.assign(state, JSON.parse(s)); }catch(e){} } }
+  loadState();
   /* ======== منطق العميل — يُحاكي سلوك السكربت الأصلي ======== */
   const API = {
     ticker: 'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT',
@@ -239,6 +244,7 @@
 
   // start loop
   setInterval(tick, 1000);
+  setInterval(saveState, 1000);
   // also run immediately
   tick();
 
