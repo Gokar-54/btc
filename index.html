@@ -103,21 +103,25 @@
 
   </div>  <script>
   /* ====== LOCAL STORAGE PERSISTENCE (لا يعود الصفر أبداً) ====== */
-  let state = {
-    prevPrice: 0,
-    cumBuys: 0,
-    cumSells: 0,
-    lastTradeId: null,
-    secBuy: 0,
-    secSell: 0,
-    lastSecondTs: 0,
-    requestCount: 0,
-    volThreshold: 10,
-    cooldownSec: 20,
-    lastSignalTime: 0,
-    currentSignal: '⚪ انتظار',
-    currentTxt: ''
-  };
+  // ===== تحسين حفظ التراكم =====
+// نحمّل الحالة أولاً إن وجدت، ثم نضيف القيم الناقصة فقط
+let saved = localStorage.getItem('eagle_state');
+let state = saved ? JSON.parse(saved) : {};
+state = {
+  prevPrice: state.prevPrice ?? 0,
+  cumBuys: state.cumBuys ?? 0,
+  cumSells: state.cumSells ?? 0,
+  lastTradeId: state.lastTradeId ?? null,
+  secBuy: state.secBuy ?? 0,
+  secSell: state.secSell ?? 0,
+  lastSecondTs: state.lastSecondTs ?? 0,
+  requestCount: state.requestCount ?? 0,
+  volThreshold: state.volThreshold ?? 10,
+  cooldownSec: state.cooldownSec ?? 20,
+  lastSignalTime: state.lastSignalTime ?? 0,
+  currentSignal: state.currentSignal ?? '⚪ انتظار',
+  currentTxt: state.currentTxt ?? ''
+};
 
   function saveState(){ localStorage.setItem('eagle_state', JSON.stringify(state)); }
   function loadState(){ const saved = localStorage.getItem('eagle_state'); if(saved){ Object.assign(state, JSON.parse(saved)); }}
@@ -209,151 +213,5 @@
 
   setInterval(()=>{ tick(); saveState(); },1000);
   tick();
-  </script></body>
-</html>
-<footer class="mt-6 text-center text-xs opacity-70">بُنيت بسرعة لتحويل برنامج بايثون إلى واجهة ويب — EagleEye OneShot (Prototype)</footer>
-
-  </div>  <script>
-  // ====== حفظ واسترجاع الحالة من localStorage ======
-  function saveState(){ localStorage.setItem('eagle_state', JSON.stringify(state)); }
-  function loadState(){ const s = localStorage.getItem('eagle_state'); if(s){ try{ Object.assign(state, JSON.parse(s)); }catch(e){} } }
-  loadState();
-  /* ======== منطق العميل — يُحاكي سلوك السكربت الأصلي ======== */
-  const API = {
-    ticker: 'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT',
-    depth:  'https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=50',
-    trades: 'https://api.binance.com/api/v3/trades?symbol=BTCUSDT&limit=100'
-  };
-
-  let state = {
-    prevPrice: 0.0,
-    cumBuys: 0.0,
-    cumSells: 0.0,
-    lastTradeId: null,
-    secBuy: 0.0,
-    secSell: 0.0,
-    lastSecondTs: 0,
-    requestCount: 0,
-    volThreshold: 10.0,
-    cooldownSec: 20,
-    lastSignalTime: 0,
-    currentSignal: '⚪ انتظار',
-    currentTxt: 'السوق هادئ، ننتظر تفاوت في الكمية'
-  };
-
-  function formatPrice(x){ return typeof x==='number' ? x.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : x }
-  function nowStr(){ return new Date().toLocaleString('ar-EG'); }
-
-  async function fetchJson(url){
-    try{
-      const r = await fetch(url);
-      if(!r.ok) throw new Error(r.statusText);
-      state.requestCount++;
-      return await r.json();
-    }catch(e){
-      console.warn('fetch error',e);
-      return null;
-    }
-  }
-
-  function supportResistanceFromBook(ob){
-    try{
-      const bids = (ob.bids||[]).map(b=>[parseFloat(b[0]),parseFloat(b[1])]);
-      const asks = (ob.asks||[]).map(a=>[parseFloat(a[0]),parseFloat(a[1])]);
-      const support = bids.length? bids.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
-      const resistance = asks.length? asks.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
-      return [support,resistance];
-    }catch(e){ return [0,0]; }
-  }
-
-  function consumeNewTrades(trades){
-    if(!trades || !trades.length) return [0,0,null,null];
-    trades.sort((a,b)=>a.id-b.id);
-    if(state.lastTradeId===null){ state.lastTradeId = trades[trades.length-1].id; return [0,0,null,null]; }
-    let buy=0,sell=0,first=null,last=null;
-    for(const t of trades){ if(t.id>state.lastTradeId){ const q=parseFloat(t.qty); if(t.isBuyerMaker) sell+=q; else buy+=q; if(first===null) first=t.id; last=t.id; }}
-    if(last!==null) state.lastTradeId = last;
-    state.cumBuys += buy; state.cumSells += sell;
-    const now = Math.floor(Date.now()/1000);
-    if(now !== state.lastSecondTs){ state.secBuy = buy; state.secSell = sell; state.lastSecondTs = now; } else { state.secBuy += buy; state.secSell += sell; }
-    return [buy,sell,first,last];
-  }
-
-  function maybeFireSignal(price,support,resistance){
-    const now = Math.floor(Date.now()/1000);
-    const inCooldown = (now - state.lastSignalTime) < state.cooldownSec;
-    const cumDiff = Math.abs(state.cumBuys - state.cumSells);
-    const cumImb = state.cumBuys - state.cumSells;
-    if(cumDiff >= state.volThreshold && cumImb > 0){
-      if(!inCooldown || state.currentSignal !== '🟢 شراء 100%'){
-        const target = resistance>0? resistance : price*1.01;
-        state.currentSignal = '🟢 شراء 100%';
-        state.currentTxt = `تفوق تراكمي في كمية الشراء → هدف أول ~ ${target.toFixed(2)}$`;
-        state.lastSignalTime = now;
-      }
-      return;
-    }
-    if(cumDiff >= state.volThreshold && cumImb < 0){
-      if(!inCooldown || state.currentSignal !== '🔴 بيع 100%'){
-        const target = support>0? support : price*0.99;
-        state.currentSignal = '🔴 بيع 100%';
-        state.currentTxt = `تفوق تراكمي في كمية البيع → هدف أول ~ ${target.toFixed(2)}$`;
-        state.lastSignalTime = now;
-      }
-      return;
-    }
-    if(!inCooldown && !state.currentSignal.startsWith('⚪')){
-      state.currentSignal = '⚪ انتظار';
-      state.currentTxt = 'لا يوجد تفاوت واضح في الكمية. ننتظر فرقًا يبلغ '+state.volThreshold+'+ BTC.';
-    }
-  }
-
-  function render(price,support,resistance){
-    document.getElementById('now').textContent = nowStr();
-    document.getElementById('requests').textContent = state.requestCount;
-    document.getElementById('price').textContent = '$' + formatPrice(price);
-    const change = price - state.prevPrice;
-    const changePercent = state.prevPrice? (change/state.prevPrice*100):0;
-    const chEl = document.getElementById('price-change');
-    chEl.textContent = `${change>=0? '▲':'▼'} ${Math.abs(change).toFixed(2)} (${Math.abs(changePercent).toFixed(2)}%)`;
-    document.getElementById('support').textContent = support? '$'+formatPrice(support):'--';
-    document.getElementById('resistance').textContent = resistance? '$'+formatPrice(resistance):'--';
-    const sigEl = document.getElementById('signal'); sigEl.textContent = state.currentSignal;
-    document.getElementById('signal-txt').textContent = state.currentTxt;
-    document.getElementById('cum-buys').textContent = state.cumBuys.toFixed(4);
-    document.getElementById('cum-sells').textContent = state.cumSells.toFixed(4);
-    document.getElementById('cum-diff').textContent = (state.cumBuys - state.cumSells).toFixed(4);
-    document.getElementById('sec-buy').textContent = state.secBuy.toFixed(4);
-    document.getElementById('sec-sell').textContent = state.secSell.toFixed(4);
-    document.getElementById('sec-diff').textContent = (state.secBuy - state.secSell).toFixed(4);
-  }
-
-  async function tick(){
-    // read UI inputs
-    const thresh = parseFloat(document.getElementById('vol-threshold').value||'10');
-    const cooldown = parseInt(document.getElementById('cooldown').value||'20');
-    state.volThreshold = isFinite(thresh)? thresh: state.volThreshold;
-    state.cooldownSec = isFinite(cooldown)? cooldown: state.cooldownSec;
-
-    const ticker = await fetchJson(API.ticker);
-    if(!ticker) return;
-    const orderBook = await fetchJson(API.depth);
-    const trades = await fetchJson(API.trades);
-
-    const price = parseFloat(ticker.lastPrice || 0);
-    if(!state.prevPrice) state.prevPrice = price;
-    const [support,resistance] = orderBook? supportResistanceFromBook(orderBook) : [0,0];
-    consumeNewTrades(trades);
-    maybeFireSignal(price,support,resistance);
-    render(price,support,resistance);
-    state.prevPrice = price;
-  }
-
-  // start loop
-  setInterval(tick, 1000);
-  setInterval(saveState, 1000);
-  // also run immediately
-  tick();
-
   </script></body>
 </html>
