@@ -1,14 +1,13 @@
 <!doctype html>
-
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>نظام عين النسر — Eagle Eye (Seeded Accounts)</title>
+  <title>Eagle Eye System — Secured</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background:#020617; color:white; font-family:system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; }
-    .glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.06);}    
+    .glass{background:rgba(255,255,255,0.04);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.06);}
     .counter-box { transition:0.18s; }
     .counter-box:hover { transform:translateY(-4px); }
     input{background:#0b1220;border:1px solid #233047;padding:.5rem;border-radius:.5rem;color:#dbeafe}
@@ -17,549 +16,207 @@
     .signal-strong{padding:.6rem 1rem;border-radius:12px;font-weight:800}
   </style>
 </head>
-<body class="min-h-screen p-6"><!-- ========== AUTH (Login/Register) ========== --><div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+<body class="min-h-screen p-6">
+
+<!-- ========== AUTH SCREEN ========== -->
+<div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
   <div class="w-full max-w-xl glass p-6 rounded-2xl">
     <div class="flex items-center gap-4">
-      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><g fill='%2306b6d4'><path d='M32 2l8 18h18l-14 10 6 18L32 36 6 48l6-18L-2 20h18z'/></g></svg>" alt="eagle" class="w-20"/>
+      <img src="https://img.icons8.com/?size=512&id=108556&format=png" class="w-20"/>
       <div>
-        <div class="text-2xl font-extrabold text-cyan-300">EAGLE EYE SYSTEM</div>
-        <div class="text-sm opacity-80">سجل دخول للوصول إلى اللوحة — (إنشاء حساب معطل من قبل المدير)</div>
+        <div class="text-3xl font-extrabold text-cyan-300">EAGLE EYE SYSTEM</div>
+        <div class="text-sm opacity-80">يجب تسجيل الدخول للوصول — التسجيل معطّل</div>
       </div>
-      <div class="mr-auto">
-        <button id="auth-logout" class="btn" style="display:none">خروج</button>
-      </div>
-    </div><div class="mt-6 grid grid-cols-2 gap-4">
-  <button id="show-login" class="py-2 rounded border border-white/6 bg-white/3">تسجيل الدخول</button>
-  <!-- زر إنشاء الحساب مخفي لأن التسجيل ممنوع -->
-  <button id="show-signup" class="py-2 rounded border border-white/6 bg-white/3" style="display:none">إنشاء حساب</button>
-</div><div id="login-form" class="mt-6">
-  <input id="login-user" placeholder="اسم المستخدم" class="w-full mb-3" />
-  <input id="login-pass" placeholder="كلمة المرور" type="password" class="w-full mb-3" />
-  <div class="flex gap-3">
-    <button id="btn-login" class="btn">دخول</button>
-    <button id="btn-demo" class="py-2 px-3 rounded bg-white/5">تجربة سريعة</button>
+    </div>
+    <div class="mt-6 grid grid-cols-2 gap-4">
+      <button id="show-login" class="py-2 rounded border border-white/6 bg-white/3">تسجيل الدخول</button>
+      <button id="show-signup" class="py-2 rounded border border-white/6 bg-white/10 hidden">إنشاء حساب</button>
+    </div>
+    <div id="login-form" class="mt-6">
+      <input id="login-user" placeholder="اسم المستخدم" class="w-full mb-3" />
+      <input id="login-pass" placeholder="كلمة المرور" type="password" class="w-full mb-3" />
+      <button id="btn-login" class="btn w-full">دخول</button>
+    </div>
   </div>
-</div><!-- نموذج التسجيل مُعطّل عمداً --><div id="signup-form" class="mt-6 hidden">
-  <input id="reg-user" placeholder="اسم مستخدم جديد" class="w-full mb-3" />
-  <input id="reg-pass" placeholder="كلمة المرور" type="password" class="w-full mb-3" />
-  <div class="flex gap-3">
-    <button id="btn-signup" class="btn">إنشاء حساب</button>
-    <button id="btn-back" class="py-2 px-3 rounded bg-white/5">عودة</button>
-  </div>
-</div>  </div>
-</div><!-- ========== DASHBOARD ========== --><div id="dashboard" style="display:none" class="max-w-7xl mx-auto">  <!-- header -->  <div class="flex items-center gap-4 mb-6">
-    <img id="header-logo" src="https://img.icons8.com/?size=512&id=108556&format=png" class="w-20"/>
+</div>
+
+<!-- ========== DASHBOARD ========== -->
+<div id="dashboard" style="display:none" class="max-w-7xl mx-auto">
+
+  <div class="flex items-center gap-4 mb-6">
+    <img src="https://img.icons8.com/?size=512&id=108556&format=png" class="w-20"/>
     <div>
       <div class="text-3xl font-extrabold text-cyan-300">EAGLE EYE SYSTEM</div>
-      <div class="text-sm opacity-70">لوحة حية — <span id="current-symbol">BTC/USDT</span> — <span class="ml-3 text-yellow-300 font-semibold">PAXG</span></div>
+      <div class="text-sm opacity-70">
+        مراقبة مباشرة — <span id="current-symbol">BTC/USDT</span>
+      </div>
     </div>
+
     <div class="mr-auto flex items-center gap-3">
-      <label class="text-sm opacity-80">رمز:</label>
+      <label class="text-sm opacity-80">الرمز:</label>
       <select id="symbol-select" class="text-black p-1 rounded">
         <option value="BTCUSDT">BTC/USDT</option>
         <option value="PAXGUSDT">PAXG/USDT</option>
       </select>
     </div>
-    <div class="flex items-center gap-3">
-      <button id="logout" class="btn">خروج</button>
-    </div>
-  </div>  <!-- SIGNAL BANNER -->  <div id="signal-banner" class="mb-4"></div>  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="md:col-span-2 glass p-6 rounded-2xl">
-      <div class="flex justify-between items-start">
-        <div>
-          <h2 class="text-lg opacity-80">السعر الحالي</h2>
-          <div id="price" class="text-4xl font-extrabold text-cyan-300 mt-2">--</div>
-          <div id="price-change" class="mt-1 opacity-80"></div>
-        </div>
-        <div class="text-right text-sm opacity-80">
-          <div>الوقت</div>
-          <div id="now" class="font-semibold mt-1">--</div>
-          <div class="mt-2">طلبات: <span id="requests">0</span></div>
-        </div>
-      </div><hr class="my-4 border-white/6" />  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div class="glass p-4 rounded-xl text-center">
-      <div class="text-xs opacity-70">الدعم</div>
-      <div id="support" class="text-2xl font-bold text-green-300">--</div>
-    </div>
-    <div class="glass p-4 rounded-xl text-center">
-      <div class="text-xs opacity-70">المقاومة</div>
-      <div id="resistance" class="text-2xl font-bold text-red-300">--</div>
-    </div>
-    <div class="glass p-4 rounded-xl text-center">
-      <div class="text-xs opacity-70">الإشارة</div>
-      <div id="signal" class="text-2xl font-bold text-yellow-300">⚪ انتظار</div>
-      <div id="signal-txt" class="text-xs opacity-80 mt-1"></div>
-    </div>
-  </div>  <hr class="my-4 border-white/6" />  <h3 class="font-semibold mb-2">إحصائيات التراكم</h3>
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div class="glass p-4 rounded-xl text-center counter-box">
-      <div class="text-xs opacity-70">شراء تراكمي</div>
-      <div id="cum-buys" class="text-2xl font-bold text-green-300">0.0000</div>
-    </div>
-    <div class="glass p-4 rounded-xl text-center counter-box">
-      <div class="text-xs opacity-70">بيع تراكمي</div>
-      <div id="cum-sells" class="text-2xl font-bold text-red-300">0.0000</div>
-    </div>
-    <div class="glass p-4 rounded-xl text-center counter-box">
-      <div class="text-xs opacity-70">الفرق</div>
-      <div id="cum-diff" class="text-2xl font-bold text-cyan-300">0.0000</div>
-    </div>
-  </div></div><div class="glass p-6 rounded-2xl">
-  <h3 class="font-semibold">إحصائيات ثانية</h3>
-  <div class="mt-4 text-sm">
-    <div>شراء / ثانية: <span id="sec-buy" class="text-green-300">0.0000</span></div>
-    <div>بيع / ثانية: <span id="sec-sell" class="text-red-300">0.0000</span></div>
-    <div class="mt-2">الفرق: <span id="sec-diff" class="text-cyan-300">0.0000</span></div>
-  </div>  <hr class="my-4 border-white/6" />
-  <div class="text-xs opacity-80"> إعدادات
-    <div class="mt-2">
-      عتبة التفاوت: <input id="vol-threshold" class="w-20 text-black rounded px-1" value="10"> BTC<br>
-      وقت التبريد (ث): <input id="cooldown" class="w-20 text-black rounded px-1 mt-2" value="20">
-    </div>
-  </div>
-</div>  </div>  <footer class="mt-8 text-center text-xs opacity-60">Eagle Eye — PAXG & BTC monitor</footer>
-</div><script>
-// ======== Authentication ========
-const usersKey = 'eagle_users_v2';
-const stateKey = 'eagle_state_v2';// ========== PRE-SEEDED ACCOUNTS ========== // عشر حسابات جاهزة، كلهم يستخدمون نفس كلمة المرور السرية (مخزنة هنا بصيغة نصية بسيطة) // إذا أردت لاحقاً تحويل التخزين إلى هاش استخدم crypto.subtle لطبعياً هش. const PRESEEDED_PASSWORD = 'SecretP@ss2025!'; const users = { 'eagle01': PRESEEDED_PASSWORD, 'eagle02': PRESEEDED_PASSWORD, 'eagle03': PRESEEDED_PASSWORD, 'eagle04': PRESEEDED_PASSWORD, 'eagle05': PRESEEDED_PASSWORD, 'eagle06': PRESEEDED_PASSWORD, 'eagle07': PRESEEDED_PASSWORD, 'eagle08': PRESEEDED_PASSWORD, 'eagle09': PRESEEDED_PASSWORD, 'eagle10': PRESEEDED_PASSWORD }; // نُخزّنها في localStorage كي تعمل عبر جلسات المتصفح localStorage.setItem(usersKey, JSON.stringify(users));
 
-function showLogin(){ document.getElementById('login-form').style.display='block'; document.getElementById('signup-form').style.display='none'; } function showSignup(){ /* التسجيل معطل */ alert('إنشاء الحساب معطّل من قبل المدير'); }
-
-document.getElementById('show-login').onclick = showLogin; document.getElementById('show-signup').onclick = showSignup; // زر مخفي لكن نحتاط // document.getElementById('btn-back').onclick = showLogin; // غير مستخدم لأن التسجيل معطل
-
-// إخفاء عناصر التسجيل لتطبيق سياسة "ممنوع حدا ينشاء حساب" document.getElementById('show-signup').style.display='none'; document.getElementById('signup-form').style.display='none';
-
-// demo quick access and login
-
-document.getElementById('btn-login').onclick = ()=>{ const u = document.getElementById('login-user').value.trim(); const p = document.getElementById('login-pass').value; const stored = JSON.parse(localStorage.getItem(usersKey)||'{}'); if(stored[u] && stored[u]===p){ localStorage.setItem('eagle_current_user', u); document.getElementById('auth-screen').style.display='none'; document.getElementById('dashboard').style.display='block'; startMonitor(); } else alert('بيانات خاطئة'); };
-
-document.getElementById('btn-demo').onclick = ()=>{ // demo quick access to the first seeded account localStorage.setItem('eagle_current_user','eagle01'); document.getElementById('auth-screen').style.display='none'; document.getElementById('dashboard').style.display='block'; startMonitor(); }
-
-document.getElementById('logout').onclick = ()=>{ localStorage.removeItem('eagle_current_user'); location.reload(); };
-
-// ======== State persistence ======== let saved = JSON.parse(localStorage.getItem(stateKey)||'null'); let state = saved || { prevPrice:0, cumBuys:0, cumSells:0, lastTradeId:null, secBuy:0, secSell:0, lastSecondTs:0, requestCount:0, volThreshold:10, cooldownSec:20, lastSignalTime:0, currentSignal:'⚪ انتظار', currentTxt:'' };
-
-function saveState(){ localStorage.setItem(stateKey, JSON.stringify(state)); }
-
-// ======== API & helpers ======== let currentSymbol = 'BTCUSDT'; function symbolToApi(sym){ return https://api.binance.com/api/v3/ }
-
-function fp(x){ return Number(x).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); } function f4(x){ return Number(x).toFixed(4); }
-
-async function fetchJson(url){ try{ const r=await fetch(url); if(!r.ok) throw 0; state.requestCount++; return await r.json(); }catch(e){ return null; } }
-
-function supportRes(orderBook){ try{ const bids = (orderBook.bids||[]).map(b=>[+b[0],+b[1]]); const asks = (orderBook.asks||[]).map(a=>[+a[0],+a[1]]); const support = bids.length? bids.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0; const resistance = asks.length? asks.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0; return [support,resistance]; }catch(e){ return [0,0]; } }
-
-function consumeTrades(trades){ if(!trades || !trades.length) return [0,0]; trades.sort((a,b)=>a.id-b.id); if(state.lastTradeId===null){ state.lastTradeId = trades.at(-1).id; return [0,0]; } let buy=0,sell=0, first=null, last=null; for(const t of trades){ if(t.id>state.lastTradeId){ const q=+t.qty; if(t.isBuyerMaker) sell+=q; else buy+=q; if(first===null) first=t.id; last=t.id; }} if(last!==null) state.lastTradeId=last; state.cumBuys += buy; state.cumSells += sell; const now = Math.floor(Date.now()/1000); if(now !== state.lastSecondTs){ state.secBuy = buy; state.secSell = sell; state.lastSecondTs = now; } else { state.secBuy += buy; state.secSell += sell; } return [buy,sell]; }
-
-// ======== SIGNAL LOGIC (التراكم + تقاطع السعر مع الدعم/المقاومة) ======== function computeSignal(price,support,resistance,prevPrice){ // 1) تراكم const buy = state.cumBuys; const sell = state.cumSells; let accumSignal = '⚪'; if(buy > sell) accumSignal = '🟢'; else if(sell > buy) accumSignal = '🔴';
-
-// 2) تقاطع السعر let crossSignal = '⚪'; if(prevPrice <= resistance && price > resistance && resistance>0) crossSignal = '🟢'; if(prevPrice >= support && price < support && support>0) crossSignal = '🔴';
-
-// 3) دمج if(accumSignal === '🟢' && crossSignal === '🟢') return {signal:'🟢 شراء قوي', color:'green', reason:'تراكم و اختراق مقاومة'}; if(accumSignal === '🔴' && crossSignal === '🔴') return {signal:'🔴 بيع قوي', color:'red', reason:'تراكم وكسر دعم'}; if(accumSignal === '🟢' && crossSignal === '⚪') return {signal:'🟢 شراء', color:'green', reason:'تراكم أعلى من البيع'}; if(accumSignal === '🔴' && crossSignal === '⚪') return {signal:'🔴 بيع', color:'red', reason:'تراكم بيع أعلى'}; if(accumSignal === '⚪' && crossSignal === '🟢') return {signal:'🟢 شراء', color:'green', reason:'اختراق مقاومة'}; if(accumSignal === '⚪' && crossSignal === '🔴') return {signal:'🔴 بيع', color:'red', reason:'كسر دعم'}; return {signal:'⚪ انتظار', color:'yellow', reason:'شروط غير متطابقة'}; }
-
-// ======== RENDER UI ======== function setSignalBanner(obj){ const banner = document.getElementById('signal-banner'); if(obj.signal.startsWith('🟢')){ banner.innerHTML = <div class="signal-strong bg-green-700/20 text-green-300">${obj.signal} — ${obj.reason}</div>; } else if(obj.signal.startsWith('🔴')){ banner.innerHTML = <div class="signal-strong bg-red-700/20 text-red-300">${obj.signal} — ${obj.reason}</div>; } else { banner.innerHTML = <div class="signal-strong bg-yellow-700/10 text-yellow-300">${obj.signal} — ${obj.reason}</div>; } }
-
-function render(price,support,resistance,prevPrice){ document.getElementById('now').textContent = new Date().toLocaleString('ar'); document.getElementById('requests').textContent = state.requestCount; document.getElementById('price').textContent = '$' + fp(price); const ch = price - (state.prevPrice||price); document.getElementById('price-change').textContent = ${ch>=0? '▲':'▼'} ${Math.abs(ch).toFixed(2)}; document.getElementById('support').textContent = support? '$'+fp(support) : '--'; document.getElementById('resistance').textContent = resistance? '$'+fp(resistance) : '--'; document.getElementById('cum-buys').textContent = f4(state.cumBuys); document.getElementById('cum-sells').textContent = f4(state.cumSells); document.getElementById('cum-diff').textContent = f4(state.cumBuys - state.cumSells); document.getElementById('sec-buy').textContent = f4(state.secBuy); document.getElementById('sec-sell').textContent = f4(state.secSell); document.getElementById('sec-diff').textContent = f4(state.secBuy - state.secSell);
-
-const sig = computeSignal(price,support,resistance,prevPrice); document.getElementById('signal').textContent = sig.signal; document.getElementById('signal-txt').textContent = sig.reason; setSignalBanner(sig); }
-
-// ======== MAIN LOOP ======== let running = false; let apiSymbol = 'BTCUSDT';
-
-document.getElementById('symbol-select').onchange = (e)=>{ apiSymbol = e.target.value; document.getElementById('current-symbol').textContent = e.target.value.replace('USDT','/USDT'); };
-
-async function tick(){ // read settings state.volThreshold = +document.getElementById('vol-threshold').value; state.cooldownSec = +document.getElementById('cooldown').value;
-
-const ticker = await fetchJson(https://api.binance.com/api/v3/ticker/24hr?symbol=${apiSymbol}); if(!ticker) return; const depth = await fetchJson(https://api.binance.com/api/v3/depth?symbol=${apiSymbol}&limit=50); const trades = await fetchJson(https://api.binance.com/api/v3/trades?symbol=${apiSymbol}&limit=100);
-
-const price = +ticker.lastPrice; const prevPrice = state.prevPrice || price; if(!state.prevPrice) state.prevPrice = price;
-
-const [support,resistance] = depth? supportRes(depth) : [0,0]; consumeTrades(trades); const sig = computeSignal(price,support,resistance,prevPrice); render(price,support,resistance,prevPrice); state.prevPrice = price; }
-
-function startMonitor(){ if(running) return; running=true; tick(); setInterval(()=>{ tick(); saveState(); },1000); }
-
-// start if already logged in if(localStorage.getItem('eagle_current_user')){ document.getElementById('auth-screen').style.display='none'; document.getElementById('dashboard').style.display='block'; startMonitor(); }
-
-</script></body>
-
-</html>    <div class="glass p-4 rounded-xl text-center counter-box">
-      <div class="text-xs opacity-70">شراء تراكمي</div>
-      <div id="cum-buys" class="text-2xl font-bold text-green-300">0.0000</div>
-    </div>
-    <div class="glass p-4 rounded-xl text-center counter-box">
-      <div class="text-xs opacity-70">بيع تراكمي</div>
-      <div id="cum-sells" class="text-2xl font-bold text-red-300">0.0000</div>
-    </div>
-    <div class="glass p-4 rounded-xl text-center counter-box">
-      <div class="text-xs opacity-70">الفرق</div>
-      <div id="cum-diff" class="text-2xl font-bold text-cyan-300">0.0000</div>
-    </div>
+    <button id="logout" class="btn">خروج</button>
   </div>
 
-</div>
+  <div id="signal-banner" class="mb-4"></div>
 
-<div class="glass p-6 rounded-2xl">
-  <h3 class="font-semibold">إحصائيات ثانية</h3>
-  <div class="mt-4 text-sm">
-    <div>شراء / ثانية: <span id="sec-buy" class="text-green-300">0.0000</span></div>
-    <div>بيع / ثانية: <span id="sec-sell" class="text-red-300">0.0000</span></div>
-    <div class="mt-2">الفرق: <span id="sec-diff" class="text-cyan-300">0.0000</span></div>
-  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-  <hr class="my-4 border-white/6" />
-  <div class="text-xs opacity-80"> إعدادات
-    <div class="mt-2">
-      عتبة التفاوت: <input id="vol-threshold" class="w-20 text-black rounded px-1" value="10"> BTC<br>
-      وقت التبريد (ث): <input id="cooldown" class="w-20 text-black rounded px-1 mt-2" value="20">
-    </div>
-  </div>
-</div>
-
-  </div>  <footer class="mt-8 text-center text-xs opacity-60">Eagle Eye — PAXG & BTC monitor</footer>
-</div><script>
-// ======== Authentication ========
-const usersKey = 'eagle_users_v2';
-const stateKey = 'eagle_state_v2';
-let users = JSON.parse(localStorage.getItem(usersKey)||'{}');
-
-function showLogin(){ document.getElementById('login-form').style.display='block'; document.getElementById('signup-form').style.display='none'; }
-function showSignup(){ document.getElementById('login-form').style.display='none'; document.getElementById('signup-form').style.display='block'; }
-
-document.getElementById('show-login').onclick = showLogin;
-document.getElementById('show-signup').onclick = showSignup;
-document.getElementById('btn-back').onclick = showLogin;
-
-document.getElementById('btn-signup').onclick = ()=>{
-  const u = document.getElementById('reg-user').value.trim();
-  const p = document.getElementById('reg-pass').value;
-  if(!u||!p) return alert('املأ الحقول');
-  if(users[u]) return alert('المستخدم موجود');
-  users[u]=p; localStorage.setItem(usersKey, JSON.stringify(users));
-  alert('تم إنشاء الحساب'); showLogin();
-};
-
-document.getElementById('btn-login').onclick = ()=>{
-  const u = document.getElementById('login-user').value.trim();
-  const p = document.getElementById('login-pass').value;
-  if(users[u] && users[u]===p){
-    localStorage.setItem('eagle_current_user', u);
-    document.getElementById('auth-screen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    startMonitor();
-  } else alert('بيانات خاطئة');
-};
-
-document.getElementById('btn-demo').onclick = ()=>{
-  // demo quick access
-  localStorage.setItem('eagle_current_user','demo');
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById('dashboard').style.display='block';
-  startMonitor();
-}
-
-document.getElementById('logout').onclick = ()=>{ localStorage.removeItem('eagle_current_user'); location.reload(); };
-
-// ======== State persistence ========
-let saved = JSON.parse(localStorage.getItem(stateKey)||'null');
-let state = saved || {
-  prevPrice:0, cumBuys:0, cumSells:0, lastTradeId:null, secBuy:0, secSell:0, lastSecondTs:0, requestCount:0, volThreshold:10, cooldownSec:20, lastSignalTime:0, currentSignal:'⚪ انتظار', currentTxt:''
-};
-
-function saveState(){ localStorage.setItem(stateKey, JSON.stringify(state)); }
-
-// ======== API & helpers ========
-let currentSymbol = 'BTCUSDT';
-function symbolToApi(sym){ return `https://api.binance.com/api/v3/` }
-
-function fp(x){ return Number(x).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function f4(x){ return Number(x).toFixed(4); }
-
-async function fetchJson(url){ try{ const r=await fetch(url); if(!r.ok) throw 0; state.requestCount++; return await r.json(); }catch(e){ return null; } }
-
-function supportRes(orderBook){
-  try{
-    const bids = (orderBook.bids||[]).map(b=>[+b[0],+b[1]]);
-    const asks = (orderBook.asks||[]).map(a=>[+a[0],+a[1]]);
-    const support = bids.length? bids.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
-    const resistance = asks.length? asks.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
-    return [support,resistance];
-  }catch(e){ return [0,0]; }
-}
-
-function consumeTrades(trades){
-  if(!trades || !trades.length) return [0,0];
-  trades.sort((a,b)=>a.id-b.id);
-  if(state.lastTradeId===null){ state.lastTradeId = trades.at(-1).id; return [0,0]; }
-  let buy=0,sell=0, first=null, last=null;
-  for(const t of trades){ if(t.id>state.lastTradeId){ const q=+t.qty; if(t.isBuyerMaker) sell+=q; else buy+=q; if(first===null) first=t.id; last=t.id; }}
-  if(last!==null) state.lastTradeId=last;
-  state.cumBuys += buy; state.cumSells += sell;
-  const now = Math.floor(Date.now()/1000);
-  if(now !== state.lastSecondTs){ state.secBuy = buy; state.secSell = sell; state.lastSecondTs = now; } else { state.secBuy += buy; state.secSell += sell; }
-  return [buy,sell];
-}
-
-// ======== SIGNAL LOGIC (التراكم + تقاطع السعر مع الدعم/المقاومة) ========
-function computeSignal(price,support,resistance,prevPrice){
-  // 1) تراكم
-  const buy = state.cumBuys; const sell = state.cumSells;
-  let accumSignal = '⚪';
-  if(buy > sell) accumSignal = '🟢';
-  else if(sell > buy) accumSignal = '🔴';
-
-  // 2) تقاطع السعر
-  let crossSignal = '⚪';
-  if(prevPrice <= resistance && price > resistance && resistance>0) crossSignal = '🟢';
-  if(prevPrice >= support && price < support && support>0) crossSignal = '🔴';
-
-  // 3) دمج
-  if(accumSignal === '🟢' && crossSignal === '🟢') return {signal:'🟢 شراء قوي', color:'green', reason:'تراكم و اختراق مقاومة'};
-  if(accumSignal === '🔴' && crossSignal === '🔴') return {signal:'🔴 بيع قوي', color:'red', reason:'تراكم وكسر دعم'};
-  if(accumSignal === '🟢' && crossSignal === '⚪') return {signal:'🟢 شراء', color:'green', reason:'تراكم أعلى من البيع'};
-  if(accumSignal === '🔴' && crossSignal === '⚪') return {signal:'🔴 بيع', color:'red', reason:'تراكم بيع أعلى'};
-  if(accumSignal === '⚪' && crossSignal === '🟢') return {signal:'🟢 شراء', color:'green', reason:'اختراق مقاومة'};
-  if(accumSignal === '⚪' && crossSignal === '🔴') return {signal:'🔴 بيع', color:'red', reason:'كسر دعم'};
-  return {signal:'⚪ انتظار', color:'yellow', reason:'شروط غير متطابقة'};
-}
-
-// ======== RENDER UI ========
-function setSignalBanner(obj){
-  const banner = document.getElementById('signal-banner');
-  if(obj.signal.startsWith('🟢')){
-    banner.innerHTML = `<div class="signal-strong bg-green-700/20 text-green-300">${obj.signal} — ${obj.reason}</div>`;
-  } else if(obj.signal.startsWith('🔴')){
-    banner.innerHTML = `<div class="signal-strong bg-red-700/20 text-red-300">${obj.signal} — ${obj.reason}</div>`;
-  } else {
-    banner.innerHTML = `<div class="signal-strong bg-yellow-700/10 text-yellow-300">${obj.signal} — ${obj.reason}</div>`;
-  }
-}
-
-function render(price,support,resistance,prevPrice){
-  document.getElementById('now').textContent = new Date().toLocaleString('ar');
-  document.getElementById('requests').textContent = state.requestCount;
-  document.getElementById('price').textContent = '$' + fp(price);
-  const ch = price - (state.prevPrice||price);
-  document.getElementById('price-change').textContent = `${ch>=0? '▲':'▼'} ${Math.abs(ch).toFixed(2)}`;
-  document.getElementById('support').textContent = support? '$'+fp(support) : '--';
-  document.getElementById('resistance').textContent = resistance? '$'+fp(resistance) : '--';
-  document.getElementById('cum-buys').textContent = f4(state.cumBuys);
-  document.getElementById('cum-sells').textContent = f4(state.cumSells);
-  document.getElementById('cum-diff').textContent = f4(state.cumBuys - state.cumSells);
-  document.getElementById('sec-buy').textContent = f4(state.secBuy);
-  document.getElementById('sec-sell').textContent = f4(state.secSell);
-  document.getElementById('sec-diff').textContent = f4(state.secBuy - state.secSell);
-
-  const sig = computeSignal(price,support,resistance,prevPrice);
-  document.getElementById('signal').textContent = sig.signal;
-  document.getElementById('signal-txt').textContent = sig.reason;
-  setSignalBanner(sig);
-}
-
-// ======== MAIN LOOP ========
-let running = false;
-let apiSymbol = 'BTCUSDT';
-
-document.getElementById('symbol-select').onchange = (e)=>{ apiSymbol = e.target.value; document.getElementById('current-symbol').textContent = e.target.value.replace('USDT','/USDT'); };
-
-async function tick(){
-  // read settings
-  state.volThreshold = +document.getElementById('vol-threshold').value;
-  state.cooldownSec = +document.getElementById('cooldown').value;
-
-  const ticker = await fetchJson(`https://api.binance.com/api/v3/ticker/24hr?symbol=${apiSymbol}`);
-  if(!ticker) return;
-  const depth = await fetchJson(`https://api.binance.com/api/v3/depth?symbol=${apiSymbol}&limit=50`);
-  const trades = await fetchJson(`https://api.binance.com/api/v3/trades?symbol=${apiSymbol}&limit=100`);
-
-  const price = +ticker.lastPrice;
-  const prevPrice = state.prevPrice || price;
-  if(!state.prevPrice) state.prevPrice = price;
-
-  const [support,resistance] = depth? supportRes(depth) : [0,0];
-  consumeTrades(trades);
-  const sig = computeSignal(price,support,resistance,prevPrice);
-  render(price,support,resistance,prevPrice);
-  state.prevPrice = price;
-}
-
-function startMonitor(){ if(running) return; running=true; tick(); setInterval(()=>{ tick(); saveState(); },1000); }
-
-// start if already logged in
-if(localStorage.getItem('eagle_current_user')){ document.getElementById('auth-screen').style.display='none'; document.getElementById('dashboard').style.display='block'; startMonitor(); }
-
-</script></body>
-</html>            <div id="cum-sells" class="text-2xl font-bold text-red-300">0.0000</div>
-          </div>
-          <div class="glass p-4 rounded-xl counter-box text-center">
-            <div class="text-xs opacity-70">الفرق التراكمي</div>
-            <div id="cum-diff" class="text-2xl font-bold text-cyan-300">0.0000</div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- RIGHT PANEL -->
-      <div class="glass p-6 rounded-2xl">
-        <h3 class="font-semibold text-lg">إحصائيات ثانية</h3>
-        <div class="mt-4 text-sm">
-          <div>شراء / ثانية: <span id="sec-buy" class="text-green-300">0.0000</span></div>
-          <div>بيع / ثانية: <span id="sec-sell" class="text-red-300">0.0000</span></div>
-          <div class="mt-2">الفرق: <span id="sec-diff" class="text-cyan-300">0.0000</span></div>
-        </div>
-        <hr class="my-5 border-gray-700" />
-        <h3 class="font-semibold mb-2">إعدادات النظام</h3>
-        <div class="text-xs opacity-80">
-          عتبة التفاوت: <input id="vol-threshold" class="w-20 text-black rounded px-1" value="10"> BTC<br>
-          وقت التبريد (ث): <input id="cooldown" class="w-20 text-black rounded px-1 mt-2" value="20">
-        </div>
-      </div>
-
+    <div class="glass p-4 rounded-xl counter-box">
+      <div class="opacity-60 mb-1">السعر الحالي</div>
+      <div id="cur-price" class="text-2xl font-bold">--</div>
     </div>
 
-    <footer class="mt-10 text-center text-xs opacity-60">Eagle Eye Dashboard — تم التصميم خصيصًا لك</footer>
+    <div class="glass p-4 rounded-xl counter-box">
+      <div class="opacity-60 mb-1">الحد العلوي</div>
+      <div id="up-limit" class="text-xl font-bold">--</div>
+    </div>
+
+    <div class="glass p-4 rounded-xl counter-box">
+      <div class="opacity-60 mb-1">الحد السفلي</div>
+      <div id="low-limit" class="text-xl font-bold">--</div>
+    </div>
+
   </div>
+
+  <footer class="mt-10 text-center text-xs opacity-60">
+    Eagle Eye Monitoring System
+  </footer>
+
 </div>
 
 <script>
-/* ====== LOGIN & REGISTER SYSTEM SIMPLE ===== */
-function showLogin(){ document.getElementById('login-page').style.display='flex'; document.getElementById('register-page').style.display='none'; }
-function showRegister(){ document.getElementById('login-page').style.display='none'; document.getElementById('register-page').style.display='flex'; }
+// ============================================================
+//        AUTHENTICATION SYSTEM — SEEDED ACCOUNTS ONLY
+// ============================================================
+const usersKey = 'eagle_users_v2';
+const PRESEEDED_PASSWORD = 'SecretP@ss2025!';
 
-function register(){
-  const u=document.getElementById('reg-username').value.trim();
-  const p=document.getElementById('reg-password').value;
-  if(!u||!p){ alert('الرجاء تعبئة جميع الحقول'); return; }
-  let users=JSON.parse(localStorage.getItem('users')||'{}');
-  if(users[u]){ alert('اسم المستخدم موجود'); return; }
-  users[u]=p;
-  localStorage.setItem('users', JSON.stringify(users));
-  alert('تم إنشاء الحساب!');
-  showLogin();
-}
-
-function login(){
-  const u=document.getElementById('login-username').value.trim();
-  const p=document.getElementById('login-password').value;
-  let users=JSON.parse(localStorage.getItem('users')||'{}');
-  if(users[u] && users[u]===p){ 
-    localStorage.setItem('currentUser', u);
-    document.getElementById('login-page').style.display='none';
-    document.getElementById('dashboard-page').style.display='block';
-  } else alert('اسم المستخدم أو كلمة المرور خاطئة');
-}
-
-function logout(){
-  localStorage.removeItem('currentUser');
-  document.getElementById('dashboard-page').style.display='none';
-  showLogin();
-}
-
-/* ====== LOCAL STORAGE PERSISTENCE DASHBOARD ===== */
-let saved = localStorage.getItem('eagle_state');
-let state = saved ? JSON.parse(saved) : {};
-state = {
-  prevPrice: state.prevPrice ?? 0,
-  cumBuys: state.cumBuys ?? 0,
-  cumSells: state.cumSells ?? 0,
-  lastTradeId: state.lastTradeId ?? null,
-  secBuy: state.secBuy ?? 0,
-  secSell: state.secSell ?? 0,
-  lastSecondTs: state.lastSecondTs ?? 0,
-  requestCount: state.requestCount ?? 0,
-  volThreshold: state.volThreshold ?? 3,
-  cooldownSec: state.cooldownSec ?? 10,
-  lastSignalTime: state.lastSignalTime ?? 0,
-  currentSignal: state.currentSignal ?? '⚪ انتظار',
-  currentTxt: state.currentTxt ?? ''
+const users = {
+  eagle01: PRESEEDED_PASSWORD,
+  eagle02: PRESEEDED_PASSWORD,
+  eagle03: PRESEEDED_PASSWORD,
+  eagle04: PRESEEDED_PASSWORD,
+  eagle05: PRESEEDED_PASSWORD,
+  eagle06: PRESEEDED_PASSWORD,
+  eagle07: PRESEEDED_PASSWORD,
+  eagle08: PRESEEDED_PASSWORD,
+  eagle09: PRESEEDED_PASSWORD,
+  eagle10: PRESEEDED_PASSWORD
 };
 
-function saveState(){ localStorage.setItem('eagle_state', JSON.stringify(state)); }
+// Store accounts
+localStorage.setItem(usersKey, JSON.stringify(users));
 
-const API={ ticker:'https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT', depth:'https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=50', trades:'https://api.binance.com/api/v3/trades?symbol=BTCUSDT&limit=100'};
+// Always reset any previous session
+localStorage.removeItem('eagle_current_user');
 
-function f(x){return Number(x).toFixed(4)}
-function fp(x){return Number(x).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
-
-async function fetchJson(url){ try{const r=await fetch(url); if(!r.ok) throw 0; state.requestCount++; return r.json();}catch{return null;} }
-
-function supportRes(ob){
-  const bids=(ob?.bids||[]).map(b=>[+b[0],+b[1]]);
-  const asks=(ob?.asks||[]).map(a=>[+a[0],+a[1]]);
-  const support=bids.length? bids.reduce((a,b)=>a[1]>b[1]?a:b)[0]:0;
-  const resistance=asks.length? asks.reduce((a,b)=>a[1]>b[1]?a:b)[0]:0;
-  return [support,resistance];
+function showLogin(){
+  document.getElementById('login-form').style.display='block';
 }
 
-function consumeTrades(tr){
-  if(!tr||!tr.length) return;
-  tr.sort((a,b)=>a.id-b.id);
-  if(state.lastTradeId===null){ state.lastTradeId=tr.at(-1).id; return; }
-  let buy=0,sell=0;
-  for(const t of tr){ if(t.id>state.lastTradeId){ const q=+t.qty; if(t.isBuyerMaker) sell+=q; else buy+=q; state.lastTradeId=t.id; }}
-  state.cumBuys+=buy; state.cumSells+=sell;
-  const now_s=Math.floor(Date.now()/1000);
-  if(now_s!==state.lastSecondTs){ state.secBuy=buy; state.secSell=sell; state.lastSecondTs=now_s; }
-  else{ state.secBuy+=buy; state.secSell+=sell; }
-}
+document.getElementById('show-login').onclick = showLogin;
 
-function maybeSignal(price,support,resistance){
-  const now=Math.floor(Date.now()/1000);
-  const inCD=(now-state.lastSignalTime)<state.cooldownSec;
-  const diff=Math.abs(state.cumBuys-state.cumSells);
-  const imb=state.cumBuys-state.cumSells;
-  if(diff>=state.volThreshold && imb>0){
-    if(!inCD||state.currentSignal!=='🟢 شراء 100%'){
-      state.currentSignal='🟢 شراء 100%';
-      state.currentTxt=`ضغط شراء قوي → هدف أول ~ ${(resistance||price*1.01).toFixed(2)}$`;
-      state.lastSignalTime=now;
-    }
-    return;
+// ===== Login handler =====
+document.getElementById('btn-login').onclick = ()=>{
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pass').value;
+  const stored=JSON.parse(localStorage.getItem(usersKey)||'{}');
+
+  if(stored[u] && stored[u]===p){
+    localStorage.setItem('eagle_current_user',u);
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    startMonitor();
+  } else {
+    alert("خطأ في اسم المستخدم أو كلمة المرور");
   }
-  if(diff>=state.volThreshold && imb<0){
-    if(!inCD||state.currentSignal!=='🔴 بيع 100%'){
-      state.currentSignal='🔴 بيع 100%';
-      state.currentTxt=`ضغط بيع قوي → هدف أول ~ ${(support||price*0.99).toFixed(2)}$`;
-      state.lastSignalTime=now;
-    }
-    return;
+};
+
+// ===== Logout =====
+document.getElementById('logout').onclick=()=>{
+  localStorage.removeItem('eagle_current_user');
+  location.reload();
+};
+
+// ===== Force login on load =====
+window.addEventListener('load', ()=>{
+  const u=localStorage.getItem('eagle_current_user');
+  if(!u){
+    document.getElementById('auth-screen').style.display='flex';
+    document.getElementById('dashboard').style.display='none';
   }
-  if(!inCD) state.currentSignal='⚪ انتظار';
+});
+
+// ============================================================
+//                 PRICE MONITORING SYSTEM
+// ============================================================
+let symbol="BTCUSDT";
+let upperLimit=0;
+let lowerLimit=0;
+
+document.getElementById("symbol-select").onchange = e=>{
+  symbol=e.target.value;
+  document.getElementById("current-symbol").innerText=symbol.replace("USDT","/USDT");
+  resetState();
+};
+
+function resetState(){
+  document.getElementById("signal-banner").innerHTML="";
 }
 
-function render(price,support,resistance){
-  document.getElementById('now').textContent=new Date().toLocaleString('ar');
-  document.getElementById('requests').textContent=state.requestCount;
-  document.getElementById('price').textContent='$'+fp(price);
-  const ch=price-state.prevPrice;
-  document.getElementById('price-change').textContent=`${ch>=0?'▲':'▼'} ${ch.toFixed(2)}`;
-  document.getElementById('support').textContent=support?'$'+fp(support):'--';
-  document.getElementById('resistance').textContent=resistance?'$'+fp(resistance):'--';
-  document.getElementById('signal').textContent=state.currentSignal;
-  document.getElementById('signal-txt').textContent=state.currentTxt;
-  document.getElementById('cum-buys').textContent=f(state.cumBuys);
-  document.getElementById('cum-sells').textContent=f(state.cumSells);
-  document.getElementById('cum-diff').textContent=f(state.cumBuys-state.cumSells);
-  document.getElementById('sec-buy').textContent=f(state.secBuy);
-  document.getElementById('sec-sell').textContent=f(state.secSell);
-  document.getElementById('sec-diff').textContent=f(state.secBuy-state.secSell);
+async function fetchPrice(){
+  try{
+    const r=await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+    const j=await r.json();
+    return parseFloat(j.price);
+  }catch(e){ return null; }
 }
 
-async function tick(){
-  state.volThreshold=+document.getElementById('vol-threshold').value;
-  state.cooldownSec=+document.getElementById('cooldown').value;
-  const t=await fetchJson(API.ticker); if(!t) return;
-  const ob=await fetchJson(API.depth);
-  const tr=await fetchJson(API.trades);
-  const price=+t.lastPrice;
-  if(!state.prevPrice) state.prevPrice=price;
-  const [s,r]=supportRes(ob);
-  consumeTrades(tr);
-  maybeSignal(price,s,r);
-  render(price,s,r);
-  state.prevPrice=price;
+function updateLimits(price){
+  const d=price*0.004;
+  upperLimit=price+d;
+  lowerLimit=price-d;
 }
 
-setInterval(()=>{ tick(); saveState(); },1000);
-tick();
+function render(price){
+  document.getElementById("cur-price").innerText = price.toFixed(2);
+  document.getElementById("up-limit").innerText = upperLimit.toFixed(2);
+  document.getElementById("low-limit").innerText = lowerLimit.toFixed(2);
+}
+
+function showSignal(type){
+  if(type==="UP"){
+    document.getElementById("signal-banner").innerHTML =
+      `<div class="bg-green-600 text-black text-lg font-bold p-3 rounded-xl">🔵 إشارة شراء (Breakout)</div>`;
+  } else if(type==="DOWN"){
+    document.getElementById("signal-banner").innerHTML =
+      `<div class="bg-red-600 text-black text-lg font-bold p-3 rounded-xl">🔴 إشارة بيع (Breakdown)</div>`;
+  } else {
+    document.getElementById("signal-banner").innerHTML="";
+  }
+}
+
+async function startMonitor(){
+  setInterval(async ()=>{
+    const price=await fetchPrice();
+    if(!price) return;
+
+    updateLimits(price);
+    render(price);
+
+    if(price>upperLimit) showSignal("UP");
+    else if(price<lowerLimit) showSignal("DOWN");
+    else showSignal("NONE");
+
+  },3000);
+}
 </script>
+
 </body>
 </html>
