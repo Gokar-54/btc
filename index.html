@@ -148,6 +148,9 @@
       padding-left: 12px;
       margin: 1rem 0;
     }
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-6 flex items-center justify-center">
@@ -203,7 +206,7 @@
 </div>
 
 <!-- ========== DASHBOARD ========== -->
-<div id="dashboard" style="display:none" class="w-full max-w-7xl">
+<div id="dashboard" class="hidden w-full max-w-7xl">
   <!-- header -->
   <div class="flex flex-col md:flex-row items-start md:items-center gap-4 mb-8">
     <div class="flex items-center gap-4">
@@ -414,30 +417,36 @@ function saveGlobalState() {
 }
 
 // ======== Authentication Handlers ========
-document.getElementById('btn-login').onclick = () => {
+document.getElementById('btn-login').addEventListener('click', handleLogin);
+
+function handleLogin() {
   const p = document.getElementById('login-pass').value;
   const errorElement = document.getElementById('error-message');
   const successElement = document.getElementById('success-message');
   
+  console.log("تم النقر على زر الدخول، كلمة المرور المدخلة:", p);
+  
   if (p === PASSWORD) {
+    console.log("كلمة المرور صحيحة، جاري الدخول...");
     errorElement.classList.add('hidden');
     successElement.classList.remove('hidden');
     
     // محاكاة عملية تحميل البيانات
     setTimeout(() => {
       document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('dashboard').classList.remove('hidden');
       startMonitor();
       successElement.classList.add('hidden');
     }, 1500);
   } else {
+    console.log("كلمة المرور غير صحيحة");
     errorElement.classList.remove('hidden');
     successElement.classList.add('hidden');
   }
-};
+}
 
 // إظهار/إخفاء كلمة المرور
-document.getElementById('toggle-password').onclick = () => {
+document.getElementById('toggle-password').addEventListener('click', function() {
   const passwordInput = document.getElementById('login-pass');
   const icon = document.getElementById('toggle-password').querySelector('i');
   
@@ -450,21 +459,21 @@ document.getElementById('toggle-password').onclick = () => {
     icon.classList.remove('fa-eye-slash');
     icon.classList.add('fa-eye');
   }
-};
+});
 
 // السماح بالدخول عند الضغط على Enter
 document.getElementById('login-pass').addEventListener('keyup', (event) => {
   if (event.key === 'Enter') {
-    document.getElementById('btn-login').click();
+    handleLogin();
   }
 });
 
-document.getElementById('logout').onclick = () => {
+document.getElementById('logout').addEventListener('click', () => {
   document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('dashboard').classList.add('hidden');
   document.getElementById('login-pass').value = '';
   document.getElementById('error-message').classList.add('hidden');
-};
+});
 
 // ======== API & helpers ========
 let currentSymbol = 'BTCUSDT';
@@ -579,4 +588,118 @@ function setSignalBanner(obj){
   const banner = document.getElementById('signal-banner');
   if(obj.signal.startsWith('🟢')){
     banner.innerHTML = `<div class="signal-strong bg-green-900/30 border border-green-700/50 text-green-300 flex items-center justify-center">
-                          <i c
+                          <i class="fas fa-arrow-up ml-2"></i>
+                          ${obj.signal} — ${obj.reason}
+                        </div>`;
+  } else if(obj.signal.startsWith('🔴')){
+    banner.innerHTML = `<div class="signal-strong bg-red-900/30 border border-red-700/50 text-red-300 flex items-center justify-center">
+                          <i class="fas fa-arrow-down ml-2"></i>
+                          ${obj.signal} — ${obj.reason}
+                        </div>`;
+  } else {
+    banner.innerHTML = `<div class="signal-strong bg-yellow-900/20 border border-yellow-700/30 text-yellow-300 flex items-center justify-center">
+                          <i class="fas fa-pause ml-2"></i>
+                          ${obj.signal} — ${obj.reason}
+                        </div>`;
+  }
+}
+
+function render(price, support, resistance, prevPrice){
+  const now = new Date();
+  document.getElementById('now').textContent = now.toLocaleTimeString('ar');
+  document.getElementById('update-time').textContent = now.toLocaleTimeString('ar');
+  document.getElementById('requests').textContent = state.requestCount;
+  document.getElementById('price').textContent = '$' + fp(price);
+  
+  const ch = price - (state.prevPrice || price);
+  const changeElement = document.getElementById('price-change');
+  changeElement.textContent = `${ch>=0? '▲':'▼'} ${Math.abs(ch).toFixed(2)} (${(ch/price*100).toFixed(2)}%)`;
+  changeElement.style.color = ch >= 0 ? '#10b981' : '#ef4444';
+  
+  document.getElementById('support').textContent = support ? '$'+fp(support) : '--';
+  document.getElementById('resistance').textContent = resistance ? '$'+fp(resistance) : '--';
+  document.getElementById('cum-buys').textContent = f4(state.cumBuys);
+  document.getElementById('cum-sells').textContent = f4(state.cumSells);
+  document.getElementById('cum-diff').textContent = f4(state.cumBuys - state.cumSells);
+  document.getElementById('sec-buy').textContent = f4(state.secBuy);
+  document.getElementById('sec-sell').textContent = f4(state.secSell);
+  document.getElementById('sec-diff').textContent = f4(state.secBuy - state.secSell);
+
+  const sig = computeSignal(price, support, resistance, prevPrice);
+  document.getElementById('signal').textContent = sig.signal;
+  document.getElementById('signal').style.color = sig.color === 'green' ? '#10b981' : 
+                                                sig.color === 'red' ? '#ef4444' : '#f59e0b';
+  document.getElementById('signal-txt').textContent = sig.reason;
+  setSignalBanner(sig);
+  
+  // تحديث وقت التهيئة وآخر تحديث
+  document.getElementById('init-time').textContent = new Date(state.initializedAt).toLocaleString('ar');
+  document.getElementById('last-update').textContent = now.toLocaleString('ar');
+}
+
+// ======== MAIN LOOP ========
+let running = false;
+let apiSymbol = 'BTCUSDT';
+
+document.getElementById('symbol-select').addEventListener('change', (e) => { 
+  apiSymbol = e.target.value; 
+  document.getElementById('current-symbol').textContent = e.target.value.replace('USDT','/USDT'); 
+});
+
+async function tick(){
+  // قراءة الإعدادات من الواجهة
+  state.volThreshold = +document.getElementById('vol-threshold').value;
+  state.cooldownSec = +document.getElementById('cooldown').value;
+
+  try {
+    const ticker = await fetchJson(`https://api.binance.com/api/v3/ticker/24hr?symbol=${apiSymbol}`);
+    if(!ticker) {
+      console.error('Failed to fetch ticker');
+      return;
+    }
+    
+    const depth = await fetchJson(`https://api.binance.com/api/v3/depth?symbol=${apiSymbol}&limit=50`);
+    const trades = await fetchJson(`https://api.binance.com/api/v3/trades?symbol=${apiSymbol}&limit=100`);
+
+    const price = +ticker.lastPrice;
+    const prevPrice = state.prevPrice || price;
+    if(!state.prevPrice) state.prevPrice = price;
+
+    const [support, resistance] = depth ? supportRes(depth) : [0, 0];
+    consumeTrades(trades);
+    render(price, support, resistance, prevPrice);
+    state.prevPrice = price;
+  } catch (error) {
+    console.error('Error in tick function:', error);
+  }
+}
+
+function startMonitor(){ 
+  if(running) return; 
+  running = true; 
+  
+  // عرض وقت التهيئة
+  document.getElementById('init-time').textContent = new Date(state.initializedAt).toLocaleString('ar');
+  
+  tick(); 
+  setInterval(() => { 
+    tick(); 
+    saveGlobalState(); 
+  }, 2000); 
+}
+
+// بدء التشغيل إذا كان المستخدم مسجل الدخول بالفعل
+if(localStorage.getItem(GLOBAL_STATE_KEY)){ 
+  // في الوضع العادي، يحتاج المستخدم لإدخال كلمة المرور
+  // لكن يمكن تفعيل هذا الجزء للاختبار
+  // document.getElementById('auth-screen').style.display = 'none'; 
+  // document.getElementById('dashboard').classList.remove('hidden'); 
+  // startMonitor(); 
+}
+
+// إضافة رسالة ترحيب في الكونسول للمساعدة في تصحيح الأخطاء
+console.log("نظام Eagle Eye جاهز للاستخدام");
+console.log("كلمة المرور الافتراضية: eagle2024");
+</script>
+</body>
+</html>
