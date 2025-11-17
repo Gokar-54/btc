@@ -151,12 +151,39 @@
     .hidden {
       display: none !important;
     }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .recommendation-card {
+      border-left: 4px solid;
+      transition: all 0.3s ease;
+    }
+    .buy-recommendation {
+      border-left-color: #10b981;
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .sell-recommendation {
+      border-left-color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .hold-recommendation {
+      border-left-color: #f59e0b;
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .countdown {
+      font-family: monospace;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-6 flex items-center justify-center">
 <!-- ========== AUTH (Login) ========== -->
 <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-  <div class="w-full max-w-md glass p-8 rounded-2xl mx-4">
+  <div class="w-full max-w-md glass p-8 rounded-2xl mx-4 fade-in">
     <div class="flex flex-col items-center text-center mb-8">
       <div class="floating-logo mb-4">
         <div class="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center glow">
@@ -228,7 +255,7 @@
           <option value="BTCUSDT">BTC/USDT</option>
           <option value="PAXGUSDT">PAXG/USDT</option>
           <option value="ETHUSDT">ETH/USDT</option>
-          <option value="ADAUSDT">ADA/USDT</option>
+          <option value="XRPUSDT">XRP/USDT</option>
         </select>
       </div>
       <div class="flex items-center gap-3">
@@ -248,6 +275,40 @@
   
   <!-- SIGNAL BANNER -->
   <div id="signal-banner" class="mb-6"></div>
+  
+  <!-- RECOMMENDATION SECTION -->
+  <div id="recommendation-section" class="mb-6 hidden">
+    <div class="glass p-4 rounded-2xl">
+      <h3 class="font-semibold mb-3 text-lg text-cyan-300">
+        <i class="fas fa-bullhorn ml-2"></i>
+        توصية التداول الحالية
+      </h3>
+      <div id="recommendation-card" class="p-4 rounded-xl">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div>
+            <div id="recommendation-type" class="text-xl font-bold mb-2">--</div>
+            <div id="recommendation-reason" class="text-sm opacity-80 mb-2">--</div>
+            <div class="flex items-center gap-4 text-sm">
+              <div>الهدف الأولي: <span id="target-price" class="font-bold">--</span></div>
+              <div>مدة التوصية: <span id="recommendation-timer" class="countdown font-bold">05:00</span></div>
+            </div>
+          </div>
+          <div id="momentum-indicator" class="mt-2 md:mt-0">
+            <div class="text-xs opacity-70">قوة الزخم</div>
+            <div class="flex items-center gap-1">
+              <div id="momentum-bars" class="flex gap-1">
+                <div class="w-3 h-3 rounded-full bg-gray-600"></div>
+                <div class="w-3 h-3 rounded-full bg-gray-600"></div>
+                <div class="w-3 h-3 rounded-full bg-gray-600"></div>
+                <div class="w-3 h-3 rounded-full bg-gray-600"></div>
+                <div class="w-3 h-3 rounded-full bg-gray-600"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 glass p-6 rounded-2xl">
@@ -298,78 +359,87 @@
 
       <h3 class="font-semibold mb-4 text-lg">
         <i class="fas fa-chart-bar text-cyan-400 ml-2"></i>
-        إحصائيات التراكم
+        إحصائيات التراكم (5 دقائق)
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="glass p-4 rounded-xl text-center counter-box">
           <div class="text-xs opacity-70 mb-2">شراء تراكمي</div>
           <div id="cum-buys" class="text-2xl font-bold text-green-300">0.0000</div>
-          <div class="text-xs opacity-70 mt-1">BTC</div>
+          <div id="cum-buys-unit" class="text-xs opacity-70 mt-1">--</div>
         </div>
         <div class="glass p-4 rounded-xl text-center counter-box">
           <div class="text-xs opacity-70 mb-2">بيع تراكمي</div>
           <div id="cum-sells" class="text-2xl font-bold text-red-300">0.0000</div>
-          <div class="text-xs opacity-70 mt-1">BTC</div>
+          <div id="cum-sells-unit" class="text-xs opacity-70 mt-1">--</div>
         </div>
         <div class="glass p-4 rounded-xl text-center counter-box">
           <div class="text-xs opacity-70 mb-2">الفرق التراكمي</div>
           <div id="cum-diff" class="text-2xl font-bold text-cyan-300">0.0000</div>
-          <div class="text-xs opacity-70 mt-1">BTC</div>
+          <div id="cum-diff-unit" class="text-xs opacity-70 mt-1">--</div>
         </div>
       </div>
     </div>
 
-    <div class="glass p-6 rounded-2xl">
-      <h3 class="font-semibold mb-4 text-lg">
-        <i class="fas fa-tachometer-alt text-cyan-400 ml-2"></i>
-        إحصائيات فورية
-      </h3>
-      <div class="space-y-4">
-        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-          <span class="opacity-80">شراء / ثانية:</span>
-          <span id="sec-buy" class="text-green-300 font-bold">0.0000</span>
+    <div class="space-y-6">
+      <div class="glass p-6 rounded-2xl">
+        <h3 class="font-semibold mb-4 text-lg">
+          <i class="fas fa-tachometer-alt text-cyan-400 ml-2"></i>
+          إحصائيات فورية
+        </h3>
+        <div class="space-y-4">
+          <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
+            <span class="opacity-80">شراء / ثانية:</span>
+            <span id="sec-buy" class="text-green-300 font-bold">0.0000</span>
+          </div>
+          <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
+            <span class="opacity-80">بيع / ثانية:</span>
+            <span id="sec-sell" class="text-red-300 font-bold">0.0000</span>
+          </div>
+          <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
+            <span class="opacity-80">الفرق / ثانية:</span>
+            <span id="sec-diff" class="text-cyan-300 font-bold">0.0000</span>
+          </div>
         </div>
-        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-          <span class="opacity-80">بيع / ثانية:</span>
-          <span id="sec-sell" class="text-red-300 font-bold">0.0000</span>
-        </div>
-        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-          <span class="opacity-80">الفرق / ثانية:</span>
-          <span id="sec-diff" class="text-cyan-300 font-bold">0.0000</span>
-        </div>
-      </div>
 
-      <hr class="my-6 border-white/10" />
-      
-      <div class="text-sm opacity-80">
-        <h4 class="font-semibold mb-3 text-cyan-300">
-          <i class="fas fa-cogs ml-2"></i>
-          إعدادات النظام
-        </h4>
-        <div class="space-y-3">
-          <div>
-            <label class="block mb-1">عتبة التفاوت (BTC):</label>
-            <input id="vol-threshold" class="w-full text-black rounded-lg px-3" value="10">
-          </div>
-          <div>
-            <label class="block mb-1">وقت التبريد (ثانية):</label>
-            <input id="cooldown" class="w-full text-black rounded-lg px-3" value="20">
+        <hr class="my-6 border-white/10" />
+        
+        <div class="text-sm opacity-80">
+          <h4 class="font-semibold mb-3 text-cyan-300">
+            <i class="fas fa-cogs ml-2"></i>
+            إعدادات النظام
+          </h4>
+          <div class="space-y-3">
+            <div>
+              <label class="block mb-1">عتبة التفاوت:</label>
+              <input id="vol-threshold" class="w-full text-black rounded-lg px-3" value="10">
+            </div>
+            <div>
+              <label class="block mb-1">وقت التبريد (ثانية):</label>
+              <input id="cooldown" class="w-full text-black rounded-lg px-3" value="20">
+            </div>
+            <div>
+              <label class="block mb-1">مدة التوصية (دقائق):</label>
+              <input id="recommendation-duration" class="w-full text-black rounded-lg px-3" value="5">
+            </div>
           </div>
         </div>
       </div>
       
-      <hr class="my-6 border-white/10" />
-      
-      <div class="text-xs opacity-60">
-        <p class="mb-2">آخر تحديث للبيانات: <span id="last-update">--</span></p>
-        <p>تم التهيئة في: <span id="init-time">--</span></p>
+      <div class="glass p-6 rounded-2xl">
+        <h3 class="font-semibold mb-4 text-lg">
+          <i class="fas fa-history text-cyan-400 ml-2"></i>
+          التوصيات السابقة
+        </h3>
+        <div id="previous-recommendations" class="space-y-3 max-h-60 overflow-y-auto">
+          <!-- سيتم ملؤها ديناميكياً -->
+        </div>
       </div>
     </div>
   </div>
   
   <footer class="mt-8 text-center text-xs opacity-60 pt-4 border-t border-white/10">
     <p>Eagle Eye System — نظام متقدم لمراقبة الأسواق المالية</p>
-    <p class="mt-1">الإصدار 2.1.0 — جميع الحقوق محفوظة &copy; 2024</p>
+    <p class="mt-1">الإصدار 2.2.0 — جميع الحقوق محفوظة &copy; 2024</p>
   </footer>
 </div>
 
@@ -378,7 +448,7 @@
 const PASSWORD = "eagle2024"; // كلمة المرور الموحدة للنظام
 
 // ======== State persistence ========
-const GLOBAL_STATE_KEY = 'eagle_global_state_v4';
+const GLOBAL_STATE_KEY = 'eagle_global_state_v5';
 
 // تحميل الحالة العامة من localStorage
 function loadGlobalState() {
@@ -387,21 +457,59 @@ function loadGlobalState() {
   if (!saved) {
     // حالة جديدة إذا لم توجد بيانات محفوظة
     return {
-      prevPrice: 0,
-      cumBuys: 0,
-      cumSells: 0,
-      lastTradeId: null,
-      secBuy: 0,
-      secSell: 0,
-      lastSecondTs: 0,
+      symbols: {
+        BTCUSDT: {
+          prevPrice: 0,
+          cumBuys: 0,
+          cumSells: 0,
+          lastTradeId: null,
+          secBuy: 0,
+          secSell: 0,
+          lastSecondTs: 0,
+          lastCumulativeReset: Date.now()
+        },
+        PAXGUSDT: {
+          prevPrice: 0,
+          cumBuys: 0,
+          cumSells: 0,
+          lastTradeId: null,
+          secBuy: 0,
+          secSell: 0,
+          lastSecondTs: 0,
+          lastCumulativeReset: Date.now()
+        },
+        ETHUSDT: {
+          prevPrice: 0,
+          cumBuys: 0,
+          cumSells: 0,
+          lastTradeId: null,
+          secBuy: 0,
+          secSell: 0,
+          lastSecondTs: 0,
+          lastCumulativeReset: Date.now()
+        },
+        XRPUSDT: {
+          prevPrice: 0,
+          cumBuys: 0,
+          cumSells: 0,
+          lastTradeId: null,
+          secBuy: 0,
+          secSell: 0,
+          lastSecondTs: 0,
+          lastCumulativeReset: Date.now()
+        }
+      },
       requestCount: 0,
       volThreshold: 10,
       cooldownSec: 20,
+      recommendationDuration: 5,
       lastSignalTime: 0,
       currentSignal: '⚪ انتظار',
       currentTxt: '',
       initializedAt: new Date().toISOString(),
-      lastUpdate: new Date().toISOString()
+      lastUpdate: new Date().toISOString(),
+      activeRecommendation: null,
+      previousRecommendations: []
     };
   }
   
@@ -424,10 +532,7 @@ function handleLogin() {
   const errorElement = document.getElementById('error-message');
   const successElement = document.getElementById('success-message');
   
-  console.log("تم النقر على زر الدخول، كلمة المرور المدخلة:", p);
-  
   if (p === PASSWORD) {
-    console.log("كلمة المرور صحيحة، جاري الدخول...");
     errorElement.classList.add('hidden');
     successElement.classList.remove('hidden');
     
@@ -439,7 +544,6 @@ function handleLogin() {
       successElement.classList.add('hidden');
     }, 1500);
   } else {
-    console.log("كلمة المرور غير صحيحة");
     errorElement.classList.remove('hidden');
     successElement.classList.add('hidden');
   }
@@ -506,15 +610,17 @@ function supportRes(orderBook){
   }
 }
 
-function consumeTrades(trades){
+function consumeTrades(trades, symbol){
   if(!trades || !trades.length) return [0,0];
+  
+  const symbolState = state.symbols[symbol];
   
   // ترتيب الصفقات حسب المعرف
   trades.sort((a,b)=>a.id-b.id);
   
   // إذا كانت هذه هي المرة الأولى، حفظ آخر معرف وعدم حساب أي شيء
-  if(state.lastTradeId===null){ 
-    state.lastTradeId = trades.at(-1).id; 
+  if(symbolState.lastTradeId === null){ 
+    symbolState.lastTradeId = trades.at(-1).id; 
     return [0,0]; 
   }
   
@@ -522,7 +628,7 @@ function consumeTrades(trades){
   
   // حساب الصفقات الجديدة فقط
   for(const t of trades){ 
-    if(t.id > state.lastTradeId){ 
+    if(t.id > symbolState.lastTradeId){ 
       const q = +t.qty; 
       if(t.isBuyerMaker) 
         sell += q; 
@@ -534,32 +640,195 @@ function consumeTrades(trades){
     }
   }
   
-  if(last !== null) state.lastTradeId = last;
-  state.cumBuys += buy;
-  state.cumSells += sell;
+  if(last !== null) symbolState.lastTradeId = last;
+  symbolState.cumBuys += buy;
+  symbolState.cumSells += sell;
+  
+  // إعادة تعيين التراكم كل 5 دقائق
+  const now = Date.now();
+  if(now - symbolState.lastCumulativeReset > 5 * 60 * 1000) {
+    symbolState.cumBuys = buy;
+    symbolState.cumSells = sell;
+    symbolState.lastCumulativeReset = now;
+  }
   
   // تحديث إحصائيات الثانية
-  const now = Math.floor(Date.now()/1000);
-  if(now !== state.lastSecondTs){ 
-    state.secBuy = buy; 
-    state.secSell = sell; 
-    state.lastSecondTs = now; 
+  const nowSec = Math.floor(Date.now()/1000);
+  if(nowSec !== symbolState.lastSecondTs){ 
+    symbolState.secBuy = buy; 
+    symbolState.secSell = sell; 
+    symbolState.lastSecondTs = nowSec; 
   } else { 
-    state.secBuy += buy; 
-    state.secSell += sell; 
+    symbolState.secBuy += buy; 
+    symbolState.secSell += sell; 
   }
   
   return [buy, sell];
 }
 
-// ======== SIGNAL LOGIC (التراكم + تقاطع السعر مع الدعم/المقاومة) ========
-function computeSignal(price, support, resistance, prevPrice){
+// ======== RECOMMENDATION SYSTEM ========
+function generateRecommendation(price, support, resistance, prevPrice, cumBuys, cumSells, symbol) {
+  const diff = cumBuys - cumSells;
+  const totalVolume = cumBuys + cumSells;
+  const buyRatio = totalVolume > 0 ? cumBuys / totalVolume : 0.5;
+  
+  // حساب الزخم
+  const priceChange = price - prevPrice;
+  const priceChangePercent = prevPrice > 0 ? (priceChange / prevPrice) * 100 : 0;
+  
+  let recommendation = {
+    type: 'انتظار',
+    reason: 'لا توجد إشارة واضحة',
+    targetPrice: null,
+    confidence: 0,
+    duration: state.recommendationDuration * 60 * 1000, // تحويل إلى ملي ثانية
+    timestamp: Date.now()
+  };
+  
+  // إشارات الشراء
+  if (diff > state.volThreshold && price > resistance && priceChangePercent > 0.1) {
+    recommendation.type = 'شراء';
+    recommendation.reason = 'تراكم شراء قوي واختراق مقاومة';
+    recommendation.targetPrice = price * (1 + (0.01 + Math.min(priceChangePercent/100, 0.05)));
+    recommendation.confidence = Math.min(80 + (buyRatio * 20), 95);
+  } 
+  // إشارات البيع
+  else if (diff < -state.volThreshold && price < support && priceChangePercent < -0.1) {
+    recommendation.type = 'بيع';
+    recommendation.reason = 'تراكم بيع قوي وكسر دعم';
+    recommendation.targetPrice = price * (1 - (0.01 + Math.min(Math.abs(priceChangePercent)/100, 0.05)));
+    recommendation.confidence = Math.min(80 + ((1 - buyRatio) * 20), 95);
+  }
+  // إشارات محايدة
+  else if (Math.abs(diff) > state.volThreshold / 2) {
+    if (diff > 0) {
+      recommendation.type = 'شراء خفيف';
+      recommendation.reason = 'تراكم شراء معتدل';
+      recommendation.targetPrice = price * 1.02;
+      recommendation.confidence = 60 + (buyRatio * 15);
+    } else {
+      recommendation.type = 'بيع خفيف';
+      recommendation.reason = 'تراكم بيع معتدل';
+      recommendation.targetPrice = price * 0.98;
+      recommendation.confidence = 60 + ((1 - buyRatio) * 15);
+    }
+  }
+  
+  return recommendation;
+}
+
+function displayRecommendation(recommendation, symbol) {
+  const section = document.getElementById('recommendation-section');
+  const card = document.getElementById('recommendation-card');
+  const typeEl = document.getElementById('recommendation-type');
+  const reasonEl = document.getElementById('recommendation-reason');
+  const targetEl = document.getElementById('target-price');
+  const timerEl = document.getElementById('recommendation-timer');
+  const momentumBars = document.getElementById('momentum-bars');
+  
+  if (recommendation.type === 'انتظار') {
+    section.classList.add('hidden');
+    return;
+  }
+  
+  section.classList.remove('hidden');
+  
+  // تعيين لون البطاقة بناءً على نوع التوصية
+  card.className = 'p-4 rounded-xl recommendation-card';
+  if (recommendation.type.includes('شراء')) {
+    card.classList.add('buy-recommendation');
+    typeEl.style.color = '#10b981';
+  } else if (recommendation.type.includes('بيع')) {
+    card.classList.add('sell-recommendation');
+    typeEl.style.color = '#ef4444';
+  } else {
+    card.classList.add('hold-recommendation');
+    typeEl.style.color = '#f59e0b';
+  }
+  
+  typeEl.textContent = `توصية ${recommendation.type} - ${symbol.replace('USDT', '')}`;
+  reasonEl.textContent = recommendation.reason;
+  targetEl.textContent = recommendation.targetPrice ? `$${fp(recommendation.targetPrice)}` : '--';
+  
+  // تحديث مؤشر الزخم
+  const confidenceBars = Math.ceil(recommendation.confidence / 20);
+  momentumBars.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const bar = document.createElement('div');
+    bar.className = `w-3 h-3 rounded-full ${i < confidenceBars ? 
+      (recommendation.type.includes('شراء') ? 'bg-green-500' : 'bg-red-500') : 'bg-gray-600'}`;
+    momentumBars.appendChild(bar);
+  }
+  
+  // بدء المؤقت
+  state.activeRecommendation = {
+    ...recommendation,
+    symbol: symbol,
+    endTime: Date.now() + recommendation.duration
+  };
+  
+  updateRecommendationTimer();
+}
+
+function updateRecommendationTimer() {
+  if (!state.activeRecommendation) return;
+  
+  const timerEl = document.getElementById('recommendation-timer');
+  const now = Date.now();
+  const timeLeft = state.activeRecommendation.endTime - now;
+  
+  if (timeLeft <= 0) {
+    // انتهت مدة التوصية
+    state.previousRecommendations.unshift({
+      ...state.activeRecommendation,
+      expired: true
+    });
+    state.activeRecommendation = null;
+    document.getElementById('recommendation-section').classList.add('hidden');
+    updatePreviousRecommendations();
+    return;
+  }
+  
+  const minutes = Math.floor(timeLeft / 60000);
+  const seconds = Math.floor((timeLeft % 60000) / 1000);
+  timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function updatePreviousRecommendations() {
+  const container = document.getElementById('previous-recommendations');
+  container.innerHTML = '';
+  
+  state.previousRecommendations.slice(0, 5).forEach(rec => {
+    const div = document.createElement('div');
+    div.className = `p-3 rounded-lg text-sm recommendation-card ${
+      rec.type.includes('شراء') ? 'buy-recommendation' : 
+      rec.type.includes('بيع') ? 'sell-recommendation' : 'hold-recommendation'
+    }`;
+    
+    const time = new Date(rec.timestamp).toLocaleTimeString('ar');
+    div.innerHTML = `
+      <div class="flex justify-between items-start">
+        <div>
+          <div class="font-semibold">${rec.type} - ${rec.symbol.replace('USDT', '')}</div>
+          <div class="text-xs opacity-80 mt-1">${rec.reason}</div>
+          ${rec.targetPrice ? `<div class="text-xs mt-1">الهدف: $${fp(rec.targetPrice)}</div>` : ''}
+        </div>
+        <div class="text-xs opacity-70">${time}</div>
+      </div>
+    `;
+    
+    container.appendChild(div);
+  });
+}
+
+// ======== SIGNAL LOGIC ========
+function computeSignal(price, support, resistance, prevPrice, cumBuys, cumSells){
+  const diff = cumBuys - cumSells;
+  
   // 1) تراكم
-  const buy = state.cumBuys; 
-  const sell = state.cumSells;
   let accumSignal = '⚪';
-  if(buy > sell) accumSignal = '🟢';
-  else if(sell > buy) accumSignal = '🔴';
+  if(diff > state.volThreshold) accumSignal = '🟢';
+  else if(diff < -state.volThreshold) accumSignal = '🔴';
 
   // 2) تقاطع السعر
   let crossSignal = '⚪';
@@ -604,28 +873,46 @@ function setSignalBanner(obj){
   }
 }
 
-function render(price, support, resistance, prevPrice){
+function getSymbolUnit(symbol) {
+  const units = {
+    'BTCUSDT': 'BTC',
+    'PAXGUSDT': 'PAXG', 
+    'ETHUSDT': 'ETH',
+    'XRPUSDT': 'XRP'
+  };
+  return units[symbol] || symbol.replace('USDT', '');
+}
+
+function render(price, support, resistance, prevPrice, symbol){
+  const symbolState = state.symbols[symbol];
+  const unit = getSymbolUnit(symbol);
+  
   const now = new Date();
   document.getElementById('now').textContent = now.toLocaleTimeString('ar');
   document.getElementById('update-time').textContent = now.toLocaleTimeString('ar');
   document.getElementById('requests').textContent = state.requestCount;
   document.getElementById('price').textContent = '$' + fp(price);
   
-  const ch = price - (state.prevPrice || price);
+  const ch = price - (symbolState.prevPrice || price);
   const changeElement = document.getElementById('price-change');
   changeElement.textContent = `${ch>=0? '▲':'▼'} ${Math.abs(ch).toFixed(2)} (${(ch/price*100).toFixed(2)}%)`;
   changeElement.style.color = ch >= 0 ? '#10b981' : '#ef4444';
   
   document.getElementById('support').textContent = support ? '$'+fp(support) : '--';
   document.getElementById('resistance').textContent = resistance ? '$'+fp(resistance) : '--';
-  document.getElementById('cum-buys').textContent = f4(state.cumBuys);
-  document.getElementById('cum-sells').textContent = f4(state.cumSells);
-  document.getElementById('cum-diff').textContent = f4(state.cumBuys - state.cumSells);
-  document.getElementById('sec-buy').textContent = f4(state.secBuy);
-  document.getElementById('sec-sell').textContent = f4(state.secSell);
-  document.getElementById('sec-diff').textContent = f4(state.secBuy - state.secSell);
+  document.getElementById('cum-buys').textContent = f4(symbolState.cumBuys);
+  document.getElementById('cum-sells').textContent = f4(symbolState.cumSells);
+  document.getElementById('cum-diff').textContent = f4(symbolState.cumBuys - symbolState.cumSells);
+  document.getElementById('sec-buy').textContent = f4(symbolState.secBuy);
+  document.getElementById('sec-sell').textContent = f4(symbolState.secSell);
+  document.getElementById('sec-diff').textContent = f4(symbolState.secBuy - symbolState.secSell);
+  
+  // تحديث الوحدات
+  document.getElementById('cum-buys-unit').textContent = unit;
+  document.getElementById('cum-sells-unit').textContent = unit;
+  document.getElementById('cum-diff-unit').textContent = unit;
 
-  const sig = computeSignal(price, support, resistance, prevPrice);
+  const sig = computeSignal(price, support, resistance, prevPrice, symbolState.cumBuys, symbolState.cumSells);
   document.getElementById('signal').textContent = sig.signal;
   document.getElementById('signal').style.color = sig.color === 'green' ? '#10b981' : 
                                                 sig.color === 'red' ? '#ef4444' : '#f59e0b';
@@ -635,6 +922,15 @@ function render(price, support, resistance, prevPrice){
   // تحديث وقت التهيئة وآخر تحديث
   document.getElementById('init-time').textContent = new Date(state.initializedAt).toLocaleString('ar');
   document.getElementById('last-update').textContent = now.toLocaleString('ar');
+  
+  // توليد التوصية إذا كانت هناك إشارة قوية
+  if (sig.signal.includes('قوي') || Math.abs(symbolState.cumBuys - symbolState.cumSells) > state.volThreshold) {
+    const recommendation = generateRecommendation(
+      price, support, resistance, prevPrice, 
+      symbolState.cumBuys, symbolState.cumSells, symbol
+    );
+    displayRecommendation(recommendation, symbol);
+  }
 }
 
 // ======== MAIN LOOP ========
@@ -644,6 +940,11 @@ let apiSymbol = 'BTCUSDT';
 document.getElementById('symbol-select').addEventListener('change', (e) => { 
   apiSymbol = e.target.value; 
   document.getElementById('current-symbol').textContent = e.target.value.replace('USDT','/USDT'); 
+});
+
+// تحديث إعدادات مدة التوصية
+document.getElementById('recommendation-duration').addEventListener('change', (e) => {
+  state.recommendationDuration = parseInt(e.target.value) || 5;
 });
 
 async function tick(){
@@ -662,13 +963,17 @@ async function tick(){
     const trades = await fetchJson(`https://api.binance.com/api/v3/trades?symbol=${apiSymbol}&limit=100`);
 
     const price = +ticker.lastPrice;
-    const prevPrice = state.prevPrice || price;
-    if(!state.prevPrice) state.prevPrice = price;
+    const symbolState = state.symbols[apiSymbol];
+    const prevPrice = symbolState.prevPrice || price;
+    if(!symbolState.prevPrice) symbolState.prevPrice = price;
 
     const [support, resistance] = depth ? supportRes(depth) : [0, 0];
-    consumeTrades(trades);
-    render(price, support, resistance, prevPrice);
-    state.prevPrice = price;
+    consumeTrades(trades, apiSymbol);
+    render(price, support, resistance, prevPrice, apiSymbol);
+    symbolState.prevPrice = price;
+    
+    // تحديث مؤشر التوصية النشطة
+    updateRecommendationTimer();
   } catch (error) {
     console.error('Error in tick function:', error);
   }
@@ -681,20 +986,14 @@ function startMonitor(){
   // عرض وقت التهيئة
   document.getElementById('init-time').textContent = new Date(state.initializedAt).toLocaleString('ar');
   
+  // تحديث التوصيات السابقة
+  updatePreviousRecommendations();
+  
   tick(); 
   setInterval(() => { 
     tick(); 
     saveGlobalState(); 
   }, 2000); 
-}
-
-// بدء التشغيل إذا كان المستخدم مسجل الدخول بالفعل
-if(localStorage.getItem(GLOBAL_STATE_KEY)){ 
-  // في الوضع العادي، يحتاج المستخدم لإدخال كلمة المرور
-  // لكن يمكن تفعيل هذا الجزء للاختبار
-  // document.getElementById('auth-screen').style.display = 'none'; 
-  // document.getElementById('dashboard').classList.remove('hidden'); 
-  // startMonitor(); 
 }
 
 // إضافة رسالة ترحيب في الكونسول للمساعدة في تصحيح الأخطاء
